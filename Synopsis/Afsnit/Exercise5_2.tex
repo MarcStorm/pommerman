@@ -1,0 +1,11 @@
+\section*{Exercise 5.2}
+What we wish to prove is 3-SAT $\leq _P$ 4-SAT. Let $c_j = z_1 \lor z_2 \lor z_3$, where $z_i, 1 \leq i \leq 3$, is the literal $x_i$ or $\bar{x_i}$. We introduce one new variable $y_{j,1}$ and define two new clauses:
+\begin{align*}
+	c'_{j,1} = z_1 \lor z_2 \lor z_3 \lor y_{j,1} \\
+	c'_{j,2} = z_1 \lor z_2 \lor z_3 \lor \bar{y_{j,1}}
+\end{align*}
+Consider a truth assignment to $X$ which makes $c_j$ true. Then all extensions of it to $X'$ will make all $c'_{j,i}$ true. Every truth assignment to $X'$ making all $c'_{j,i}$ true makes $c_j$ true.
+
+If the answer to $X$ is YES, then there is a truth assignment to $X$ which satisfies all clauses in $C$. We have shown that it can be extended to $X'$ satisfying $C'$.
+
+If the answer to $X'$ is YES, then there is a truth assignment to $X'$ which satisfies all clauses in $C'$. We have shown that if all clauses in $C'$ are satisfied then so are all clauses in $C$.

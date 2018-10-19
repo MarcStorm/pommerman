@@ -1,0 +1,6 @@
+\section{A}
+The goal of the problem is to find a Spanning Tree such that neither the summed weight of the edges in the Spanning Tree or the mirrored edges surpass the number \verb=B=. By mirrored edges the following description can be made: 
+
+Imagine having a list of 5 edges $\{e_1,e_2,e_3,e_4,e_5\}$. Then the mirrored edge would be the edge in the opposing end of the list, i.e. the mirrored edge of $e_1$ is $e_5$ and vice versa, the mirrored edge of $e_2$ is $e_4$ and vice versa, the mirrored edge of $e_3$ is itself as this the third edge counting from the start but also the third edge counting from the end.
+\newline \newline
+Now for the triangle graph given in the exercise description the output would be \verb=YES=, as there is a \textsc{Mfmst} more specifically consisting of the edges $\{e_1 = \{1,2\}, e_3 = \{1,3\}\}$ of weight $1$ and $3$ respectively. The weight of these sum up to 4, and as the mirrored edges are the same two edges, so does the weight of the mirrored edges. As the maximum of these two sums is 4, the solution to the problem is \verb=YES=.

@@ -1,0 +1,10 @@
+\section*{Exercise 5.1}
+
+\begin{description}
+\item [3-clauses] A 3-clause is made into the same clause without using any additional helping variables.
+\item [2-clauses] A 2-clause is made into two clauses with one helping variable.
+\item [1-clauses] A 1-clause is made into four clauses with two helping variables.
+\item [$>3$-clauses] A $>3$-clause, a clause with more than 3 literals, is made into $m-2$ clauses with $m-3$ helping variables.
+\end{description}
+
+So the total number of clauses in the 3-SAT problem will at most be $O(k \cdot n)$ since there are $k$ clauses in the SAT problem, where each clause contain at most $n$ literals.

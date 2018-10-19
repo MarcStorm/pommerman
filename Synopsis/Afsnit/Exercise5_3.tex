@@ -1,0 +1,37 @@
+\section*{Exercise 5.3}
+%The refutation problem written into logic looks as follows
+%\begin{align}
+%	\neg ( m_1 \lor m_2 \lor \ldots \lor m_k) = \textit{TRUE} \label{eq:ref}
+%\end{align}
+%where $m_i = z_1 \wedge z_2 \wedge \ldots \wedge z_n, 1 \leq i \leq k$. Using De Morgan's laws from propositional logic, we can rewrite eq.~\ref{eq:ref} to
+%\begin{align*}
+%	\neg m_1 \wedge \neg m_2 \wedge \ldots \wedge \neg m_k
+%\end{align*}
+%for a monomial $m_i = z_1 \wedge z_2 \wedge \ldots \wedge z_n, 1 \leq i \leq k$. Looking at each monomial $m_i$
+%\begin{align*}
+%	\neg m_i &= \neg (z_1 \wedge z_2 \wedge \ldots \wedge z_n)
+%	&= \neg z_1 \lor \neg z_2 \lor \ldots \lor \neg z_n)
+%\end{align*}
+What we wish to prove is SAT $\leq _P$ REFUTATION.
+
+SAT looks as follows
+\begin{align*}
+	c_1 \wedge c_2 \wedge \ldots \wedge c_j = TRUE
+\end{align*}
+Where each clause looks like
+\begin{align}
+	c_i = z_1 \lor z_2 \lor \ldots \lor z_g	 \label{eq:cla}
+\end{align}
+If we negate a clause and apply De Morgan's laws from propositional logic, we can rewrite eq.~\ref{eq:cla} to
+\begin{align*}
+	\neg c_i &= \neg ( z_1 \lor z_2 \lor \ldots \lor z_g) \\
+	&= \neg z_1 \wedge \neg z_2 \wedge \ldots \wedge \neg z_g)
+\end{align*}
+We now have $\neg c_i = m_i$ and shown that SAT can be transformed into the REFUTATION problem. If we do that for all clauses in $C$ we get the following
+\begin{align}
+	\neg c_1 \wedge \neg c_2 \wedge \ldots \wedge \neg c_j = TRUE \label{eq:c}
+\end{align}
+Again we can apply De Morgan's laws on eq.~\ref{eq:c} and we get
+\begin{align*}
+	\neg (c_1 \lor c_2 \lor \ldots \lor c_j) = TRUE
+\end{align*}
