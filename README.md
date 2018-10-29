@@ -12,17 +12,18 @@ Change directory to the git repository:
 cd Pommerman
 ```
 
-Run the setup script:
-```
-make setup
-```
-
 Create a virtual environment:
 ```
 virtualenv venv
 ```
 
-Install dependencies:
+Activate the virtual env:
 ```
-pip install -r requirements.txt
+source venv/bin/activate
 ```
+
+Run the setup script:
+```
+make setup
+```
+
