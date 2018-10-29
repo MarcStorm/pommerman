@@ -1,3 +1,3 @@
 setup:
 	git submodule update --init --recursive
-	pip install -r requirements.txt
+	cd pommerman/playground && pip install -U .
