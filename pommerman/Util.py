@@ -1,3 +1,7 @@
+import numpy as np
+import torch
+
+
 # Flattens a state s on the form list<dict> where each dict contains information of a state
 def flatten_state(s):
     # Usage Example:
