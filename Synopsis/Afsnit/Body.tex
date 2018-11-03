@@ -1,0 +1,55 @@
+\section{Background and Motivation}
+% Accomplishing tasks with infinitely meaningful variation is common in the real world and difficult to simulate. Competitive multi-agent learning enables this. Every game the agent plays is a novel environment with a new degree of difficulty. Of games that fit that description, Bomberman is a fun and intuitive one that people already love to play. Additionally, it is tenable for all participants as it's not necessary to train with pixels.
+
+% Why Multi-Agent Learning?
+
+% The best way to push research forward is through strong benchmarks testing different facets of intelligence. Multi-Agent Learning does not have one, and we want to rectify that. Pommerman's FFA is a simple but challenging setup for engaging adversarial research where coalitions are possible, and Team asks agents to be able to work with others to accomplish a shared, but competitive goal.
+
+%Background
+Reinforcement learning has previously been used to solve a number of different games such as Chess\footnote{\href{https://arxiv.org/pdf/1712.01815.pdf}{Mastering Chess and Shogi by Self-Play with a General Reinforcement Learning Algorithm}} and Go\footnote{\href{https://www.nature.com/articles/nature24270.epdf}{Mastering the game of Go without human knowledge}}, both of which are zero sum games. Reinforcement learning has excelled at playing Go, where the number of possible moves are so many that a traditional heuristic is not sufficient to solve the problem successfully. These games only contain two players, whereas a game like Dota II is 5 vs. 5 game. That makes it a multi-agent environment and a non-zero sum game, which introduces additional challenges for machine learning.\footnote{\href{https://blog.openai.com/openai-five/}{OpenAI Five}}
+
+The motivation for researching state of the art techniques for solving these problems is intriguing. Although much research has been done in the past years we have not yet seen revolutionary approaches, making headline such as AlphaZero or AlphaGo. We as a group would like to explore these state of the art approaches on the game Pommerman to evaluate how far machine learning has come, solving non-zero sum games in single- and multi-agent environments. We do not strafe for ground breaking research within the topic.
+
+\section{Milestones}
+\subsubsection{Committed goals}
+\begin{enumerate}
+    \item Get a consistent FFA agent beating three RandomAgents on average more than 50\%.
+    \item Get a consistent FFA agent beating one RandomAgents two SimpleAgents on average more than 50\%.
+    \item Get a consistent FFA agent to beat three SimpleAgents on average with more than 50\%.
+    \item Design an algorithm to incorporate some learning between your controlled agents.
+\end{enumerate}
+
+\subsubsection{Stretch goals}
+\begin{enumerate}
+    \item Beat the RandomAgents with your two cooperating agents with more than 50\% on average.
+    \item Beat the SimpleAgents with your two cooperating agents with more than 50\% on average.
+\end{enumerate}
+
+\begin{thebibliography}{9}
+
+\bibitem[Pommerman]{Pommerman}
+    \newblock Pommerman,
+    \newblock{\url{https://www.pommerman.com}},
+    \newblock (Retrieved: 19$^{th}$ October 2018).
+
+\bibitem[Panait, 2005]{Panait:2005}
+    \newblock Panait L, Luke S. Cooperative Multi-Agent Learning: The State of the Art
+    \newblock November 2005.
+    \newblock{Autonomous Agents and Multi-Agent Systems, Volume 11, Issue 3, pp 387–434}.
+
+\bibitem[Lowe et al., 2017]{LOWE:2017}
+	\newblock Multi-agent actor-critic for mixed cooperative-competitive environments,
+    \newblock 2017.
+    \newblock{Lowe, Ryan and Wu, Yi and Tamar, Aviv and Harb, Jean and Abbeel, OpenAI Pieter and Mordatch, Igor},
+    \newblock Advances in Neural Information Processing Systems
+    \newblock Pages 6379--6390
+
+\bibitem[Sutton, Barto, 2017]{Sutton:2017}
+    \newblock Sutton, R. S.; Barto, A. G., 
+    \newblock Reinforcement Learning: An Introduction, November 5, 2017, Second Draft.
+
+\bibitem[Kapoor, 2017]{Kapoor:2017}
+    \newblock Sanyam Kapoor, 
+    \newblock Multi-Agent Reinforcement Learning: A Report on Challenges and Approaches, July 26, 2018.
+    
+\end{thebibliography}
