@@ -1,0 +1,36 @@
+% Insert preamble with all the necessary packages.
+\input{sections/preamble}
+
+\begin{document}
+
+% Insert frontpage
+\input{sections/front-page}
+
+\input{sections/abstract}
+
+% Two-column layout throughout the main article text
+\begin{multicols}{2}
+
+% Sections of the main article.
+
+\input{sections/introduction}
+
+
+\input{sections/results}
+
+\input{sections/discussion}
+
+
+\input{sections/conclusion}
+
+%\input{Afsnit/ReferenceList}
+
+% End the two-column layout from the main article text
+\end{multicols}
+
+% Makes sure that there's a pagebreak before the appendix.
+\pagebreak
+
+\input{sections/appendix}
+
+\end{document}
