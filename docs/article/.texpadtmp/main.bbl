@@ -1,0 +1,25 @@
+\begin{thebibliography}{YPB14}
+
+\bibitem[Ba10a]{Barni}
+Barni, Mauro; Bianchi, Tiziano; Catalano, Dario; Di~Raimondo, Mario;
+  Donida~Labati, Ruggero; Failla, Pierluigi; Fiore, Dario; Lazzeretti,
+  Riccardo; Piuri, Vincenzo; Scotti, Fabio et~al.: Privacy-preserving
+  fingercode authentication.
+\newblock In: Proceedings of the 12th ACM workshop on Multimedia and security.
+\newblock ACM, pp. 231--240, 2010.
+
+\bibitem[Ba10b]{Barni:2010}
+Barni, Mauro; Bianchi, Tiziano; Catalano, Dario; Di~Raimondo, Mario; Labati,
+  Ruggero~Donida; Failla, Pierluigi; Fiore, Dario; Lazzeretti, Riccardo; Piuri,
+  Vincenzo; Piva, Alessandro et~al.: A privacy-compliant fingerprint
+  recognition system based on homomorphic encryption and fingercode templates.
+\newblock In: Biometrics: theory applications and systems (BTAS), 2010 Fourth
+  IEEE International Conference on.
+\newblock IEEE, pp. 1--7, 2010.
+
+\bibitem[YPB14]{Bertino:2014}
+Yi, Xun; Paulet, Russell; Bertino, Elisa: Homomorphic encryption and
+  applications, volume~3.
+\newblock Springer, 2014.
+
+\end{thebibliography}

@@ -1,0 +1,72 @@
+This is BibTeX, Version 0.99d (TeX Live 2016)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: /Users/Marc/Projects/github.com/MarcStorm/pommerman/docs/article/.texpadtmp/main.aux
+The style file: ../lni.bst
+Illegal, another \bibstyle command---line 24 of file /Users/Marc/Projects/github.com/MarcStorm/pommerman/docs/article/.texpadtmp/main.aux
+ : \bibstyle
+ :          {lnig}
+I'm skipping whatever remains of this command
+Database file #1: ../sections/bibliography.bib
+title$ is an unknown function---line 1057 of file ../lni.bst
+ptr=1, stack=
+B
+---the literal stack isn't empty for entry Barni:2010
+while executing---line 1252 of file ../lni.bst
+ptr=1, stack=
+B
+---the literal stack isn't empty for entry Barni
+while executing---line 1252 of file ../lni.bst
+ptr=1, stack=
+
+---the literal stack isn't empty for entry Barni
+while executing---line 1319 of file ../lni.bst
+ptr=1, stack=
+
+---the literal stack isn't empty for entry Barni:2010
+while executing---line 1319 of file ../lni.bst
+ptr=1, stack=
+
+---the literal stack isn't empty for entry Bertino:2014
+while executing---line 1319 of file ../lni.bst
+You've used 3 entries,
+            2538 wiz_defined-function locations,
+            588 strings with 5517 characters,
+and the built_in function-call counts, 1896 in all, are:
+= -- 169
+> -- 151
+< -- 3
++ -- 57
+- -- 55
+* -- 152
+:= -- 319
+add.period$ -- 8
+call.type$ -- 3
+change.case$ -- 32
+chr.to.int$ -- 2
+cite$ -- 3
+duplicate$ -- 58
+empty$ -- 103
+format.name$ -- 58
+if$ -- 381
+int.to.chr$ -- 2
+int.to.str$ -- 0
+missing$ -- 4
+newline$ -- 17
+num.names$ -- 9
+pop$ -- 41
+preamble$ -- 1
+purify$ -- 38
+quote$ -- 0
+skip$ -- 60
+stack$ -- 0
+substring$ -- 70
+swap$ -- 17
+text.length$ -- 3
+text.prefix$ -- 2
+top$ -- 0
+type$ -- 20
+warning$ -- 0
+while$ -- 15
+width$ -- 4
+write$ -- 39
+(There were 7 error messages)
