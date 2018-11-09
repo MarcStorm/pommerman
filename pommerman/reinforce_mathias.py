@@ -2,6 +2,7 @@ import util
 
 '''An example to show how to set up an pommerman game programmatically'''
 import time
+import copy
 import pommerman
 from util import flatten_state
 from pommerman import agents
@@ -60,16 +61,15 @@ class Reward(object):
         reward = 0
 
         if self.last_obs is None:
-            self.last_obs = obs
+            self.last_obs = copy.deepcopy(obs)
 
         last_freq = self.get_board_freq(self.last_obs['board'])
         curr_freq = self.get_board_freq(obs['board'])
         wood_diff = last_freq[Item.Wood] - curr_freq[Item.Wood]
 
-        if wood_diff > 0:
-            print(wood_diff)
+        reward += 30*wood_diff
 
-        self.last_obs = obs
+        self.last_obs = copy.deepcopy(obs)
 
         alive_agents = [num for num, agent in enumerate(self.agents) \
                         if agent.is_alive]
@@ -77,27 +77,27 @@ class Reward(object):
         if len(alive_agents) == 0:
             print("TIE!")
             # Game is tie, everyone gets -1.
-            return -300
+            return reward - 300
         elif len(alive_agents) == 1:
             # An agent won. Give them +1, others -1.
             if alive_agents[0] == self.agent_id:
-                return 100
+                return reward + 100
             else:
-                return -300
+                return reward - 300
         elif self.env._step_count > self.env._max_steps:
             # Game is over from time. Everyone gets -1.
-            return -300
+            return reward - 300
         else:
             # Game running: 0 for alive, -1 for dead.
             if self.agent.is_alive:
                 valid_actions = util.get_valid_actions(obs)
                 if action in valid_actions:
-                    return -1
+                    return reward - 1
                 else:
-                    return -2
-                return 0
+                    return reward - 2
+                return reward
             else:
-                return -300
+                return reward - 300
 
 
 class NewAgent(agents.BaseAgent):
@@ -230,6 +230,7 @@ try:
     for i in range(num_episodes):
         rollout = []
         s = env.reset()
+        policy.reward.reset()
         done = False
         #policy.train()
         while not done:
@@ -267,6 +268,7 @@ try:
             validation_rewards = []
             for _ in range(3):
                 s = env.reset()
+                policy.reward.reset()
                 reward = 0
                 done = False
                 while not done:
