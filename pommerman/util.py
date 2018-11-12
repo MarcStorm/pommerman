@@ -1,5 +1,7 @@
 import numpy as np
 import torch
+from pommerman import utility
+from pommerman.constants import Action
 
 
 # Flattens a state s on the form list<dict> where each dict contains information of a state
@@ -42,6 +44,7 @@ def flatten_state_aux(s):
     return a.astype(float)
 
 
+
 def flatten_state_no_board(s):
     # Usage Example:
 	# def forward(self, x):
@@ -80,3 +83,22 @@ def flatten_state_aux_no_board(s):
     #a = np.append(a,teammate.value)
     #a = np.append(a,[e.value for e in enemies])
     return a.astype(float)
+
+def get_valid_actions(obs):
+    board = obs['board']
+    enemies  = obs['enemies']
+    ammo = obs['ammo']
+    my_position = tuple(obs['position'])
+    directions = [
+        Action.Up, Action.Down, Action.Left, Action.Right
+    ]
+    valid_actions = []
+    for d in directions:
+        p = utility.get_next_position(my_position, d)
+        if utility.position_on_board(board, p) and utility.position_is_passable(board, p, enemies):
+            valid_actions.append(d)
+    valid_actions.append(Action.Stop)
+    if ammo > 0:
+        valid_actions.append(Action.Bomb)
+    return valid_actions
+
