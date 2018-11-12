@@ -20,6 +20,8 @@ import torch.nn as nn
 
 use_cuda = torch.cuda.is_available()
 
+print("Using CUDA: {}".format(use_cuda))
+
 def get_cuda(x):
     """ Converts tensors to cuda, if available. """
     if use_cuda:
