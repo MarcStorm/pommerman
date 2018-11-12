@@ -3,7 +3,6 @@ import sys
 import numpy as np
 import torch
 import random
-import datetime
 import matplotlib.pyplot as plt
 from pommerman.agents import SimpleAgent, RandomAgent, PlayerAgent, BaseAgent
 from pommerman.configs import ffa_v0_fast_env
@@ -19,8 +18,6 @@ import torch.optim as optim
 import torch.nn as nn
 
 use_cuda = torch.cuda.is_available()
-
-print("Using CUDA: {}".format(use_cuda))
 
 def get_cuda(x):
     """ Converts tensors to cuda, if available. """
@@ -44,6 +41,10 @@ def flatten_state(s):
 
 
 def flatten_state_aux(s):
+    # Lists
+    #print ("---------------------------")
+    #print (s)
+    #print ("---------------------------")
     alive = [1 if x in s['alive'] else 0 for x in range(10,14)]
     board = s['board']
     bomb_blast_strength = s['bomb_blast_strength']
@@ -71,6 +72,10 @@ def flatten_state_aux(s):
     #a = np.append(a,teammate.value)
     #a = np.append(a,[e.value for e in enemies])
     return a.astype(float)
+
+
+
+
 
 
 torch.cuda.is_available()
@@ -151,19 +156,10 @@ class TrainingAgent(BaseAgent):
     def act(self, obs, action_space):
         return 0
 
-# training settings
-debug = False
-num_episodes = 10
-
-discount_factor = 1.0 # reward discount factor (gamma), 1.0 = no discount
-learning_rate = 0.001 # you know this by now
-val_freq = 5 # validation frequency
-
-
 # train Deep Q-network
 
 num_episodes = 1000
-episode_limit = 100
+#episode_limit = 100
 batch_size = 64
 learning_rate = 0.005
 gamma = 0.99 # discount rate
@@ -183,23 +179,24 @@ if use_cuda:
 
 replay_memory = ReplayMemory(replay_memory_capacity)
 
+# Add four random agents
+agents = []
+#for agent_id in range(4):
+#    agents[agent_id] = RandomAgent(config["agent"](agent_id, config["game_type"]))
+agents = {
+    '0' : SimpleAgent(config["agent"](0, config["game_type"])),
+    '1' : RandomAgent(config["agent"](1, config["game_type"])),
+    '2' : RandomAgent(config["agent"](2, config["game_type"])),
+    '3' : TrainingAgent(config["agent"](3, config["game_type"]))
+}
+env.set_agents(list(agents.values()))
+env.set_training_agent(3)
+env.set_init_game_state(None)   
+
 # prefill replay memory with random actions
 if prefill_memory:
     print('prefill replay memory')
-    # Add four random agents
-    agents = []
-    #for agent_id in range(4):
-    #    agents[agent_id] = RandomAgent(config["agent"](agent_id, config["game_type"]))
-    agents = {
-        '0' : SimpleAgent(config["agent"](0, config["game_type"])),
-        '1' : RandomAgent(config["agent"](1, config["game_type"])),
-        '2' : RandomAgent(config["agent"](2, config["game_type"])),
-        '3' : TrainingAgent(config["agent"](3, config["game_type"]))
-    }
-    env.set_agents(list(agents.values()))
-    env.set_training_agent(3)
-    env.set_init_game_state(None)
-
+    
     s = env.reset()
     while replay_memory.count() < replay_memory_capacity:
         a = env.act(s)
@@ -207,37 +204,26 @@ if prefill_memory:
         s1, r, d, _ = env.step(a)
         replay_memory.add(s[3], a[3], r[3], s1[3], d)
         s = s1 if not d else env.reset()
-
+        
 # training loop
 try:
     print('start training')
     epsilon = 1.0
     rewards, lengths, losses, epsilons = [], [], [], []
     for i in range(num_episodes):
-
-        # Add four random agents
-        agents = []
-        #for agent_id in range(4):
-        #    agents[agent_id] = RandomAgent(config["agent"](agent_id, config["game_type"]))
-        agents = {
-            '0' : SimpleAgent(config["agent"](0, config["game_type"])),
-            '1' : RandomAgent(config["agent"](1, config["game_type"])),
-            '2' : RandomAgent(config["agent"](2, config["game_type"])),
-            '3' : TrainingAgent(config["agent"](3, config["game_type"]))
-        }
-        env.set_agents(list(agents.values()))
-        env.set_training_agent(3)
-        env.set_init_game_state(None)
         s = env.reset()
-
+        
         # init new episode
         ep_reward, ep_loss = 0, 0
-        for j in range(episode_limit):
+        d = False
+        j = -1
+        while not d:
+            j += 1
             # select action with epsilon-greedy strategy
             if np.random.rand() < epsilon:
                 a = env.action_space.sample()
             else:
-                with torch.no_grad():
+                with torch.no_grad():         
                     a = get_numpy(policy_dqn(np.atleast_1d(s[3]))).argmax().item()
             # perform action
             actions = env.act(s)
@@ -252,7 +238,7 @@ try:
                 ss, aa, rr, ss1, dd = batch[:,0], batch[:,1], batch[:,2], batch[:,3], batch[:,4]
                 # do forward pass of batch
                 policy_dqn.optimizer.zero_grad()
-
+                
                 Q = policy_dqn(ss)
                 # use target network to compute target Q-values
                 with torch.no_grad():
@@ -274,7 +260,6 @@ try:
             s = s1
             ep_reward += r[3]
             ep_loss += loss.item()
-            if d: break
         # bookkeeping
         #epsilon = epsilon
         epsilon *= num_episodes/(i/(num_episodes/20)+num_episodes) # decrease epsilon
@@ -284,36 +269,34 @@ try:
 except KeyboardInterrupt:
     print('interrupt')
 
-
 # plot results
 def moving_average(a, n=10) :
     ret = np.cumsum(a, dtype=float)
     ret[n:] = ret[n:] - ret[:-n]
     return ret / n
 
-# plt.figure(figsize=(16, 9))
-# plt.subplot(411)
-# plt.title('training rewards')
-# plt.plot(range(1, num_episodes+1), rewards)
-# plt.plot(moving_average(rewards))
-# plt.xlim([0, num_episodes])
-# plt.subplot(412)
-# plt.title('training lengths')
-# plt.plot(range(1, num_episodes+1), lengths)
-# plt.plot(range(1, num_episodes+1), moving_average(lengths))
-# plt.xlim([0, num_episodes])
-# plt.subplot(413)
-# plt.title('training loss')
-# plt.plot(range(1, num_episodes+1), losses)
-# plt.plot(range(1, num_episodes+1), moving_average(losses))
-# plt.xlim([0, num_episodes])
-# plt.subplot(414)
-# plt.title('epsilon')
-# plt.plot(range(1, num_episodes+1), epsilons)
-# plt.xlim([0, num_episodes])
-# plt.tight_layout(); plt.show()
+plt.figure(figsize=(16, 9))
+plt.subplot(411)
+plt.title('training rewards')
+plt.plot(range(1, num_episodes+1), rewards)
+plt.plot(moving_average(rewards))
+plt.xlim([0, num_episodes])
+plt.subplot(412)
+plt.title('training lengths')
+plt.plot(range(1, num_episodes+1), lengths)
+plt.plot(range(1, num_episodes+1), moving_average(lengths))
+plt.xlim([0, num_episodes])
+plt.subplot(413)
+plt.title('training loss')
+plt.plot(range(1, num_episodes+1), losses)
+plt.plot(range(1, num_episodes+1), moving_average(losses))
+plt.xlim([0, num_episodes])
+plt.subplot(414)
+plt.title('epsilon')
+plt.plot(range(1, num_episodes+1), epsilons)
+plt.xlim([0, num_episodes])
+plt.tight_layout(); plt.show()
 
 ## Save file
-t = datetime.date.today().strftime("%Y-%m-%d")
-PATH = "resources/q_agent_{}.pt".format(t)
+PATH = "resources/q_agent.pt"
 torch.save(policy_dqn.state_dict(), PATH)
