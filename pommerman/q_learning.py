@@ -3,6 +3,7 @@ import sys
 import numpy as np
 import torch
 import random
+import datetime
 import matplotlib.pyplot as plt
 from pommerman.agents import SimpleAgent, RandomAgent, PlayerAgent, BaseAgent
 from pommerman.configs import ffa_v0_fast_env
@@ -41,10 +42,6 @@ def flatten_state(s):
 
 
 def flatten_state_aux(s):
-    # Lists
-    #print ("---------------------------")
-    #print (s)
-    #print ("---------------------------")
     alive = [1 if x in s['alive'] else 0 for x in range(10,14)]
     board = s['board']
     bomb_blast_strength = s['bomb_blast_strength']
@@ -72,10 +69,6 @@ def flatten_state_aux(s):
     #a = np.append(a,teammate.value)
     #a = np.append(a,[e.value for e in enemies])
     return a.astype(float)
-
-
-
-
 
 
 torch.cuda.is_available()
@@ -296,28 +289,29 @@ def moving_average(a, n=10) :
     ret[n:] = ret[n:] - ret[:-n]
     return ret / n
 
-plt.figure(figsize=(16, 9))
-plt.subplot(411)
-plt.title('training rewards')
-plt.plot(range(1, num_episodes+1), rewards)
-plt.plot(moving_average(rewards))
-plt.xlim([0, num_episodes])
-plt.subplot(412)
-plt.title('training lengths')
-plt.plot(range(1, num_episodes+1), lengths)
-plt.plot(range(1, num_episodes+1), moving_average(lengths))
-plt.xlim([0, num_episodes])
-plt.subplot(413)
-plt.title('training loss')
-plt.plot(range(1, num_episodes+1), losses)
-plt.plot(range(1, num_episodes+1), moving_average(losses))
-plt.xlim([0, num_episodes])
-plt.subplot(414)
-plt.title('epsilon')
-plt.plot(range(1, num_episodes+1), epsilons)
-plt.xlim([0, num_episodes])
-plt.tight_layout(); plt.show()
+# plt.figure(figsize=(16, 9))
+# plt.subplot(411)
+# plt.title('training rewards')
+# plt.plot(range(1, num_episodes+1), rewards)
+# plt.plot(moving_average(rewards))
+# plt.xlim([0, num_episodes])
+# plt.subplot(412)
+# plt.title('training lengths')
+# plt.plot(range(1, num_episodes+1), lengths)
+# plt.plot(range(1, num_episodes+1), moving_average(lengths))
+# plt.xlim([0, num_episodes])
+# plt.subplot(413)
+# plt.title('training loss')
+# plt.plot(range(1, num_episodes+1), losses)
+# plt.plot(range(1, num_episodes+1), moving_average(losses))
+# plt.xlim([0, num_episodes])
+# plt.subplot(414)
+# plt.title('epsilon')
+# plt.plot(range(1, num_episodes+1), epsilons)
+# plt.xlim([0, num_episodes])
+# plt.tight_layout(); plt.show()
 
 ## Save file
-PATH = "resources/q_agent.pt"
+t = datetime.date.today().strftime("%Y-%m-%d")
+PATH = "resources/q_agent_{}.pt".format(t)
 torch.save(policy_dqn.state_dict(), PATH)
