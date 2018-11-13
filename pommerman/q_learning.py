@@ -18,6 +18,7 @@ import torch.optim as optim
 import torch.nn as nn
 
 use_cuda = torch.cuda.is_available()
+print('CUDA IS ON: {}').format(use_cuda)
 
 def get_cuda(x):
     """ Converts tensors to cuda, if available. """
@@ -191,12 +192,12 @@ agents = {
 }
 env.set_agents(list(agents.values()))
 env.set_training_agent(3)
-env.set_init_game_state(None)   
+env.set_init_game_state(None)
 
 # prefill replay memory with random actions
 if prefill_memory:
     print('prefill replay memory')
-    
+
     s = env.reset()
     while replay_memory.count() < replay_memory_capacity:
         a = env.act(s)
@@ -204,7 +205,7 @@ if prefill_memory:
         s1, r, d, _ = env.step(a)
         replay_memory.add(s[3], a[3], r[3], s1[3], d)
         s = s1 if not d else env.reset()
-        
+
 # training loop
 try:
     print('start training')
@@ -212,7 +213,7 @@ try:
     rewards, lengths, losses, epsilons = [], [], [], []
     for i in range(num_episodes):
         s = env.reset()
-        
+
         # init new episode
         ep_reward, ep_loss = 0, 0
         d = False
@@ -223,7 +224,7 @@ try:
             if np.random.rand() < epsilon:
                 a = env.action_space.sample()
             else:
-                with torch.no_grad():         
+                with torch.no_grad():
                     a = get_numpy(policy_dqn(np.atleast_1d(s[3]))).argmax().item()
             # perform action
             actions = env.act(s)
@@ -238,7 +239,7 @@ try:
                 ss, aa, rr, ss1, dd = batch[:,0], batch[:,1], batch[:,2], batch[:,3], batch[:,4]
                 # do forward pass of batch
                 policy_dqn.optimizer.zero_grad()
-                
+
                 Q = policy_dqn(ss)
                 # use target network to compute target Q-values
                 with torch.no_grad():
@@ -274,7 +275,7 @@ def moving_average(a, n=10) :
     ret = np.cumsum(a, dtype=float)
     ret[n:] = ret[n:] - ret[:-n]
     return ret / n
-
+'''
 plt.figure(figsize=(16, 9))
 plt.subplot(411)
 plt.title('training rewards')
@@ -296,7 +297,7 @@ plt.title('epsilon')
 plt.plot(range(1, num_episodes+1), epsilons)
 plt.xlim([0, num_episodes])
 plt.tight_layout(); plt.show()
-
+'''
 ## Save file
 PATH = "resources/q_agent.pt"
 torch.save(policy_dqn.state_dict(), PATH)
