@@ -159,7 +159,7 @@ class TrainingAgent(BaseAgent):
 
 # train Deep Q-network
 
-num_episodes = 1000
+num_episodes = 175000
 #episode_limit = 100
 batch_size = 64
 learning_rate = 0.005
@@ -167,7 +167,7 @@ gamma = 0.99 # discount rate
 tau = 0.01 # target network update rate
 replay_memory_capacity = 10000
 prefill_memory = True
-val_freq = 100 # validation frequency
+val_freq = 200001 # validation frequency
 
 # initialize DQN and replay memory
 policy_dqn = DQN(n_inputs, n_outputs, learning_rate)
