@@ -18,7 +18,7 @@ import torch.optim as optim
 import torch.nn as nn
 
 use_cuda = torch.cuda.is_available()
-print('CUDA IS ON: {}').format(use_cuda)
+print('CUDA IS ON: {}'.format(use_cuda))
 
 def get_cuda(x):
     """ Converts tensors to cuda, if available. """
