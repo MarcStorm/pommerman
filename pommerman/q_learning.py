@@ -3,6 +3,7 @@ import sys
 import numpy as np
 import torch
 import random
+import datetime
 import matplotlib.pyplot as plt
 from pommerman.agents import SimpleAgent, RandomAgent, PlayerAgent, BaseAgent
 from pommerman.configs import ffa_v0_fast_env
@@ -159,7 +160,8 @@ class TrainingAgent(BaseAgent):
 
 # train Deep Q-network
 
-num_episodes = 175000
+#num_episodes = 175000
+num_episodes = 500
 #episode_limit = 100
 batch_size = 64
 learning_rate = 0.005
@@ -299,5 +301,6 @@ plt.xlim([0, num_episodes])
 plt.tight_layout(); plt.show()
 '''
 ## Save file
-PATH = "resources/q_agent.pt"
+t = datetime.date.today().strftime("%Y-%m-%d")
+PATH = "resources/q_agent_{}.pt".format(t)
 torch.save(policy_dqn.state_dict(), PATH)
