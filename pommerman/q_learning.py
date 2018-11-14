@@ -4,6 +4,7 @@ import numpy as np
 import torch
 import random
 import datetime
+from util import flatten_state, flatten_state_no_board
 from pommerman.agents import SimpleAgent, RandomAgent, PlayerAgent, BaseAgent
 from pommerman.configs import ffa_v0_fast_env
 from pommerman.envs.v0 import Pomme
@@ -73,11 +74,6 @@ def flatten_state_aux(s):
     #a = np.append(a,teammate.value)
     #a = np.append(a,[e.value for e in enemies])
     return a.astype(float)
-
-
-
-
-
 
 torch.cuda.is_available()
 
@@ -188,7 +184,14 @@ class DQN(nn.Module):
             torch.nn.init.xavier_uniform(m.weight)
             m.bias.data.fill_(0.01)
 
+    # Function from old network
+    def update_params(self, new_params, tau):
+        params = self.state_dict()
+        for k in params.keys():
+            params[k] = (1-tau) * params[k] + tau * new_params[k]
+        self.load_state_dict(params)
 
+    # The commented code below is the old network.
     """Deep Q-network with target network"""
     '''
     def __init__(self, n_inputs, n_outputs, learning_rate):
@@ -248,8 +251,7 @@ class TrainingAgent(BaseAgent):
 
 # train Deep Q-network
 
-#num_episodes = 175000
-num_episodes = 100000
+num_episodes = 50000
 #episode_limit = 100
 batch_size = 64
 learning_rate = 0.005
