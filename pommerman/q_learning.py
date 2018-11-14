@@ -161,7 +161,7 @@ class TrainingAgent(BaseAgent):
 # train Deep Q-network
 
 #num_episodes = 175000
-num_episodes = 500
+num_episodes = 5
 #episode_limit = 100
 batch_size = 64
 learning_rate = 0.005
