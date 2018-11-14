@@ -4,7 +4,6 @@ import numpy as np
 import torch
 import random
 import datetime
-import matplotlib.pyplot as plt
 from pommerman.agents import SimpleAgent, RandomAgent, PlayerAgent, BaseAgent
 from pommerman.configs import ffa_v0_fast_env
 from pommerman.envs.v0 import Pomme
@@ -100,9 +99,98 @@ class ReplayMemory(object):
     def count(self):
         return len(self.memory)
 
-class DQN(nn.Module):
-    """Deep Q-network with target network"""
+batch_norm=False
+in_channels = 3
+out_channels = 3
+kernel_size = 5
 
+class DQN(nn.Module):
+
+    def __init__(self, n_inputs, n_hidden, n_outputs, learning_rate):
+        super(DQN, self).__init__()
+        # network
+        self.other_shape = [3]
+
+        #Input for conv2d is (batch_size, num_channels, width, height)
+        self.conv1 = nn.Conv2d(in_channels = in_channels, out_channels=out_channels,
+                               kernel_size=kernel_size, stride=1, padding=2)
+
+        self.conv2 = nn.Conv2d(in_channels = in_channels, out_channels=out_channels,
+                               kernel_size=kernel_size, stride=1, padding=2)
+
+        self.conv3 = nn.Conv2d(in_channels = in_channels, out_channels=out_channels,
+                               kernel_size=kernel_size, stride=1, padding=2)
+
+        self.convolution_out_size = 11*11*3
+
+        self.ffn_input_size = n_inputs
+
+        self.ffn = nn.Sequential(
+            nn.Linear(n_inputs, n_hidden),
+            nn.ReLU(),
+            nn.Dropout(0.25),
+            nn.Linear(n_hidden, n_hidden),
+            nn.ReLU(),
+            nn.Dropout(0.25),
+            nn.Linear(n_hidden, n_hidden),
+            nn.ReLU(),
+            nn.Linear(n_hidden, n_hidden),
+            nn.ReLU(),
+            nn.Dropout(0.25),
+            nn.Linear(n_hidden, n_outputs),
+        )
+
+        self.activation = F.relu
+
+        if batch_norm:
+            self.bn1 = nn.BatchNorm2d(11)
+        else:
+            self.bn1 = lambda x: x
+            self.bn2 = lambda x: x
+            self.bn3 = lambda x: x
+
+        self.ffn.apply(self.init_weights)
+
+        self.optimizer = optim.Adam(self.parameters(), lr=learning_rate)
+
+    def forward(self, x):
+        board_length = len(x[0]['board'])
+        completeBoard = [[
+                        [[state['board'][x,y] for y in range(board_length)] for x in range(board_length)],
+                        [[state['bomb_blast_strength'][x,y] for y in range(board_length)] for x in range(board_length)],
+                        [[state['bomb_life'][x,y] for y in range(board_length)] for x in range(board_length)]
+                        ] for state in x]
+
+        completeBoard = np.asarray(completeBoard)
+        completeBoard = torch.tensor(completeBoard)
+        completeBoard = completeBoard.float()
+        boardVariable = torch.autograd.Variable(completeBoard)
+        board = self.conv1(boardVariable)
+        board = self.bn1(board)
+        board = self.activation(board)
+        board = self.conv2(board)
+        board = self.bn1(board)
+        board = self.activation(board)
+        board = self.conv3(board)
+        board = self.bn1(board)
+        board = self.activation(board)
+        x2 = board.view(-1, self.convolution_out_size)
+        x = flatten_state_no_board(x)
+        x = torch.cat([x2, x], dim=1)
+        x = self.ffn(x)
+        return F.softmax(x, dim=1)
+
+    def loss(self, action_probabilities, returns):
+        return -torch.mean(torch.mul(torch.log(action_probabilities), returns))
+
+    def init_weights(m, *args):
+        if type(m) == nn.Linear:
+            torch.nn.init.xavier_uniform(m.weight)
+            m.bias.data.fill_(0.01)
+
+
+    """Deep Q-network with target network"""
+    '''
     def __init__(self, n_inputs, n_outputs, learning_rate):
         super(DQN, self).__init__()
         # network
@@ -128,6 +216,7 @@ class DQN(nn.Module):
         for k in params.keys():
             params[k] = (1-tau) * params[k] + tau * new_params[k]
         self.load_state_dict(params)
+    '''
 
 # one-hot encoder for the states
 def one_hot(i, l):
@@ -142,7 +231,6 @@ env = Pomme(**config["env_kwargs"])
 
 #n_inputs = env.observation_space.shape[0]
 n_inputs = 372
-#n_hidden = 20
 n_hidden = 500
 n_outputs = env.action_space.n
 
@@ -172,8 +260,8 @@ prefill_memory = True
 val_freq = 10000 # validation frequency
 
 # initialize DQN and replay memory
-policy_dqn = DQN(n_inputs, n_outputs, learning_rate)
-target_dqn = DQN(n_inputs, n_outputs, learning_rate)
+policy_dqn = DQN(n_inputs, n_hidden, n_outputs, learning_rate)
+target_dqn = DQN(n_inputs, n_hidden, n_outputs, learning_rate)
 target_dqn.load_state_dict(policy_dqn.state_dict())
 
 if use_cuda:
