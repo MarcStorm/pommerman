@@ -186,7 +186,7 @@ class PolicyNet(nn.Module):
     def loss(self, action_probabilities, returns):
         return -torch.mean(torch.mul(torch.log(action_probabilities), returns))
     
-    def init_weights(m, *args):
+    def init_weights(self, m, *args):
         if type(m) == nn.Linear:
             torch.nn.init.xavier_uniform(m.weight)
             m.bias.data.fill_(0.01)

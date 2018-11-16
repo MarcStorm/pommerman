@@ -3,6 +3,21 @@ import torch
 from pommerman import utility
 from pommerman.constants import Action
 
+use_cuda = torch.cuda.is_available()
+print("Cuda:",use_cuda)
+
+def get_cuda(x):
+    """ Converts tensors to cuda, if available. """
+    if use_cuda:
+        return x.cuda()
+    return x
+
+def get_numpy(x):
+    """ Get numpy array for both cuda and not. """
+    if use_cuda:
+        return x.cpu().numpy()
+    return x.numpy()
+
 
 # Flattens a state s on the form list<dict> where each dict contains information of a state
 def flatten_state(s):
