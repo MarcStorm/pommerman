@@ -18,7 +18,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 import torch.nn as nn
 
-use_cuda = torch.cuda.is_available()
+use_cuda = False
 print('CUDA IS ON: {}'.format(use_cuda))
 
 def get_cuda(x):
