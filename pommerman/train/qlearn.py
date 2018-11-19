@@ -57,6 +57,7 @@ class QTraining(BaseTraining):
                 returns = self.compute_returns(rewards)
                 # policy gradient update
                 self.neuralNet.optimizer.zero_grad()
+                # pylint: disable=maybe-no-member
                 a_probs = self.neuralNet([s[0] for s in states]).gather(1, torch.from_numpy(actions)).view(-1)
                 loss = self.neuralNet.loss(a_probs, torch.from_numpy(returns).float())
                 loss.backward()

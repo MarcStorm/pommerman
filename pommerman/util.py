@@ -10,6 +10,7 @@ def flatten_state(s):
 	# def forward(self, x):
 	#     x = flatten_state(x)
 	# where x is np.atleast1d(S[0])
+    # pylint: disable=maybe-no-member
 	return torch.from_numpy(np.array([flatten_state_aux(x) for x in s])).float()
 	
 
@@ -50,6 +51,7 @@ def flatten_state_no_board(s):
 	# def forward(self, x):
 	#     x = flatten_state(x)
 	# where x is np.atleast1d(S[0])
+    # pylint: disable=maybe-no-member
 	return torch.from_numpy(np.array([flatten_state_aux_no_board(x) for x in s])).float()
 	
 
@@ -108,6 +110,7 @@ def flatten_state_not_first_board(s):
 	# def forward(self, x):
 	#     x = flatten_state(x)
 	# where x is np.atleast1d(S[0])
+    # pylint: disable=maybe-no-member
 	return torch.from_numpy(np.array([flatten_state_aux_not_first_board(x) for x in s])).float()
 	
 
