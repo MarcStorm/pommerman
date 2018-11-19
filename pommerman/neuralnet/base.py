@@ -8,17 +8,20 @@ import numpy as np
 use_cuda = torch.cuda.is_available()
 print("Cuda:",use_cuda)
 
+
 def get_cuda(x):
     """ Converts tensors to cuda, if available. """
     if use_cuda:
         return x.cuda()
     return x
 
+
 def get_numpy(x):
     """ Get numpy array for both cuda and not. """
     if use_cuda:
         return x.cpu().numpy()
     return x.numpy()
+
 
 
 class PolicyNet(nn.Module):

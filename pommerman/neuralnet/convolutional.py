@@ -4,8 +4,9 @@ Module implements a convolutional neural network
 
 import torch
 from torch import nn, optim, F
-from policy import PolicyNet, get_cuda, get_numpy
 import numpy as np
+
+from .base import PolicyNet, get_cuda, get_numpy
 
 
 class ConvNet(PolicyNet):
