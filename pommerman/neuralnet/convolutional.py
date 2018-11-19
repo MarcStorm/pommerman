@@ -3,7 +3,8 @@ Module implements a convolutional neural network
 """
 
 import torch
-from torch import nn, optim, F
+from torch import nn, optim
+import torch.nn.functional as F
 import numpy as np
 
 from .base import PolicyNet, get_cuda, get_numpy
@@ -11,7 +12,7 @@ from .base import PolicyNet, get_cuda, get_numpy
 
 class ConvNet(PolicyNet):
     def __init__(
-            self, input_shape, num_channels=64, output_size=512,
+            self, input_shape=(4,11,11), num_channels=64, output_size=6,
             batch_norm=True, activation=F.relu):
         super(ConvNet, self).__init__()
 
@@ -41,7 +42,10 @@ class ConvNet(PolicyNet):
         self.fc2 = nn.Linear(1024, output_size)
 
 
-    def forward(self, x):
+    def forward(self, obs):
+        print(obs)
+        x = self.compact_state_list(obs)
+
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.activation(x)
@@ -58,6 +62,11 @@ class ConvNet(PolicyNet):
         return out
 
 
+    def compact_state_list(self, obs):
+        # pylint: disable=maybe-no-member
+        return torch.from_numpy(np.array([self.compact_state(s) for s in obs])).float()
+
+
     def compact_state(self, obs):
         """
         Returns a compact state representation of a 4x11x11 ndarray
@@ -66,7 +75,18 @@ class ConvNet(PolicyNet):
         """
         board = obs['board']
         enemy = self.enemy_map(obs)
+        print("Enemy:")
+        print(enemy)
+        print("----------------")
+
         danger = self.danger_map(obs)
+        print("Danger:")
+        print(danger)
+        print("----------------")
+
         position = self.position_map(obs)
+        print("Position:")
+        print(position)
+        print("----------------")
         return np.stack((board, enemy, danger, position))
 

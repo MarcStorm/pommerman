@@ -2,7 +2,7 @@
 Module implements general utilifies and base classes for neural networks
 """
 import torch
-from torch import nn, optim, F
+from torch import nn
 import numpy as np
 
 use_cuda = torch.cuda.is_available()
@@ -69,7 +69,7 @@ class PolicyNet(nn.Module):
         Greater numbers means more immediate danger
         """
         board = np.zeros_like(obs['board'])
-        strength = obs['board_blast_strength']
+        strength = obs['bomb_blast_strength']
         life = obs['bomb_life']
         for x,y in np.argwhere(life>0):
             s = strength[x,y]
