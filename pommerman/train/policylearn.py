@@ -13,8 +13,8 @@ from .base import BaseTraining
 
 class PolicyTraining(BaseTraining):
     
-    def __init__(self, neuralNet, num_episodes, discount_factor, val_freq):
-        super().__init__()
+    def __init__(self, env, neuralNet, num_episodes, discount_factor, val_freq):
+        super().__init__(env)
         self.num_episodes = num_episodes
         self.discount_factor = discount_factor
         self.val_freq = val_freq
