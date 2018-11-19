@@ -4,7 +4,7 @@ import numpy as np
 import torch
 import random
 import datetime
-from util import flatten_state, flatten_state_no_board
+import util
 from pommerman.agents import SimpleAgent, RandomAgent, PlayerAgent, BaseAgent
 from pommerman.configs import ffa_v0_fast_env
 from pommerman.envs.v0 import Pomme
@@ -32,48 +32,6 @@ def get_numpy(x):
     if use_cuda:
         return x.cpu().data.numpy()
     return x.data.numpy()
-
-# Flattens a state s on the form list<dict> where each dict contains information of a state
-def flatten_state(s):
-    # Usage Example:
-	# def forward(self, x):
-	#     x = flatten_state(x)
-	# where x is np.atleast1d(S[0])
-	return torch.from_numpy(np.array([flatten_state_aux(x) for x in s])).float()
-
-
-def flatten_state_aux(s):
-    # Lists
-    #print ("---------------------------")
-    #print (s)
-    #print ("---------------------------")
-    alive = [1 if x in s['alive'] else 0 for x in range(10,14)]
-    board = s['board']
-    bomb_blast_strength = s['bomb_blast_strength']
-    bomb_life = s['bomb_life']
-    # Tuples
-    position = s['position']
-    # Ints
-    blast_strength = s['blast_strength']
-    can_kick = s['can_kick']
-    ammo = s['ammo']
-    # Enums
-    teammate = s['teammate'] #9 for FFA
-    enemies = s['enemies'] #11,12,13 for FFA and training agent id = 0
-
-    a = np.append(np.array(alive),np.array(board).flatten())
-    a = np.append(a,np.array(bomb_blast_strength).flatten())
-    a = np.append(a,np.array(bomb_life).flatten())
-    a = np.append(a,position[0])
-    a = np.append(a,position[1])
-    a = np.append(a,blast_strength)
-    a = np.append(a,can_kick)
-    a = np.append(a,ammo)
-    # Commented out as we get size 376 but expected 372. I assume we calculated wrong.
-    # Makes sense to ignore these imo
-    #a = np.append(a,teammate.value)
-    #a = np.append(a,[e.value for e in enemies])
-    return a.astype(float)
 
 torch.cuda.is_available()
 
@@ -108,7 +66,7 @@ class DQN(nn.Module):
         self.other_shape = [3]
 
         #Input for conv2d is (batch_size, num_channels, width, height)
-        self.conv1 = nn.Conv2d(in_channels = in_channels, out_channels=out_channels,
+        self.conv1 = nn.Conv2d(in_channels = 1, out_channels=out_channels,
                                kernel_size=kernel_size, stride=1, padding=2)
 
         self.conv2 = nn.Conv2d(in_channels = in_channels, out_channels=out_channels,
@@ -119,11 +77,14 @@ class DQN(nn.Module):
 
         self.convolution_out_size = 11*11*3
 
-        self.ffn_input_size = n_inputs
+        #self.ffn_input_size = n_inputs
+        self.ffn_input_size = out_channels * 11 * 11 + 251
+
 
         self.ffn = nn.Sequential(
-            nn.Linear(n_inputs, n_hidden),
+            nn.Linear(self.ffn_input_size, n_hidden),
             nn.ReLU(),
+            #
             nn.Dropout(0.25),
             nn.Linear(n_hidden, n_hidden),
             nn.ReLU(),
@@ -149,19 +110,23 @@ class DQN(nn.Module):
 
         self.optimizer = optim.Adam(self.parameters(), lr=learning_rate)
 
-    def forward(self, x):
-        board_length = len(x[0]['board'])
-        completeBoard = [[
-                        [[state['board'][x,y] for y in range(board_length)] for x in range(board_length)],
-                        [[state['bomb_blast_strength'][x,y] for y in range(board_length)] for x in range(board_length)],
-                        [[state['bomb_life'][x,y] for y in range(board_length)] for x in range(board_length)]
-                        ] for state in x]
 
-        completeBoard = np.asarray(completeBoard)
-        completeBoard = torch.tensor(completeBoard)
-        completeBoard = completeBoard.float()
-        boardVariable = torch.autograd.Variable(completeBoard)
-        board = self.conv1(boardVariable)
+    def forward(self, x):
+        board = x[0]['board']
+
+        board = torch.tensor(board)
+        board = board.unsqueeze(0)
+        board = board.unsqueeze(0)
+        board = board.float()
+        for i in range(1,len(x)):
+            completeBoard = torch.tensor(x[i]['board'])
+            completeBoard = completeBoard.unsqueeze(0)
+            completeBoard = completeBoard.unsqueeze(0)
+            completeBoard = completeBoard.float()
+            board = torch.cat([board, completeBoard], dim=0)
+
+        board = torch.autograd.Variable(board)
+        board = self.conv1(board)
         board = self.bn1(board)
         board = self.activation(board)
         board = self.conv2(board)
@@ -170,12 +135,16 @@ class DQN(nn.Module):
         board = self.conv3(board)
         board = self.bn1(board)
         board = self.activation(board)
+
         x2 = board.view(-1, self.convolution_out_size)
-        x = flatten_state_no_board(x)
+
+        x = util.flatten_state_not_first_board(x)
         x = torch.cat([x2, x], dim=1)
+
         x = self.ffn(x)
-        print(x)
-        return F.softmax(x, dim=1)
+
+        x = F.softmax(x, dim=1)
+        return x
 
     def loss(self, action_probabilities, returns):
         return -torch.mean(torch.mul(torch.log(action_probabilities), returns))
@@ -192,35 +161,13 @@ class DQN(nn.Module):
             params[k] = (1-tau) * params[k] + tau * new_params[k]
         self.load_state_dict(params)
 
-    # The commented code below is the old network.
-    """Deep Q-network with target network"""
-    '''
-    def __init__(self, n_inputs, n_outputs, learning_rate):
-        super(DQN, self).__init__()
-        # network
-        self.hidden = nn.Linear(n_inputs, n_hidden)
-        self.out = nn.Linear(n_hidden, n_outputs)
-        # training
-        self.optimizer = optim.Adam(self.parameters(), lr=learning_rate)
-
-    def forward(self, x):
-        x = flatten_state(x)
-        x = get_cuda(x)
-        x = self.hidden(x)
-        x = F.relu(x)
-        x = self.out(x)
-        x = F.softmax(x, dim=1)
-        return x
-
-    def loss(self, q_outputs, q_targets):
-        return torch.sum(torch.pow(q_targets - q_outputs, 2))
-
-    def update_params(self, new_params, tau):
-        params = self.state_dict()
-        for k in params.keys():
-            params[k] = (1-tau) * params[k] + tau * new_params[k]
-        self.load_state_dict(params)
-    '''
+def compute_returns(rewards, discount_factor):
+    """Compute discounted returns."""
+    returns = np.zeros(len(rewards))
+    returns[-1] = rewards[-1]
+    for t in reversed(range(len(rewards)-1)):
+        returns[t] = rewards[t] + discount_factor * returns[t+1]
+    return returns
 
 # one-hot encoder for the states
 def one_hot(i, l):
@@ -253,7 +200,6 @@ class TrainingAgent(BaseAgent):
 # train Deep Q-network
 
 num_episodes = 5000
-#episode_limit = 100
 batch_size = 64
 learning_rate = 0.005
 gamma = 0.99 # discount rate
