@@ -174,6 +174,7 @@ class DQN(nn.Module):
         x = flatten_state_no_board(x)
         x = torch.cat([x2, x], dim=1)
         x = self.ffn(x)
+        print(x)
         return F.softmax(x, dim=1)
 
     def loss(self, action_probabilities, returns):
