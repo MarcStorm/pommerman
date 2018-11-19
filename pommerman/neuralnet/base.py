@@ -27,7 +27,10 @@ def get_numpy(x):
 class PolicyNet(nn.Module):
     """
     Policy network is a base class for policy networks which
-    implements general utilities
+    implements general utilities. Every neural network for the
+    pommerman environment must have a `forward` method which takes
+    the observation state `obs` as input and returns a tensor with the
+    size of the action space.
     """
 
     def loss(self, action_probabilities, returns):
