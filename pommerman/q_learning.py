@@ -174,6 +174,7 @@ class DQN(nn.Module):
         x = flatten_state_no_board(x)
         x = torch.cat([x2, x], dim=1)
         x = self.ffn(x)
+        print(x)
         return F.softmax(x, dim=1)
 
     def loss(self, action_probabilities, returns):
@@ -251,7 +252,7 @@ class TrainingAgent(BaseAgent):
 
 # train Deep Q-network
 
-num_episodes = 50000
+num_episodes = 5000
 #episode_limit = 100
 batch_size = 64
 learning_rate = 0.005
