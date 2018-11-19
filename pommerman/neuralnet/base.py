@@ -31,6 +31,7 @@ class PolicyNet(nn.Module):
     """
 
     def loss(self, action_probabilities, returns):
+        # pylint: disable=maybe-no-member
         return -torch.mean(torch.mul(torch.log(action_probabilities), returns))
 
 
