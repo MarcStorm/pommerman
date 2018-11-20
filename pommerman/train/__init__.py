@@ -6,5 +6,5 @@ methods e.g. Q-Learning, REINFORCE etc.
 #from .qlearn import QTraining
 #from.policylearn import PolicyTraining
 
-from .qlearn import QTraining
-from .policylearn import PolicyTraining
+from .trainers import QTraining, PolicyTraining
+
