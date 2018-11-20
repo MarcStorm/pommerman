@@ -228,10 +228,10 @@ n_inputs = 372
 n_hidden = 500
 n_outputs = env.action_space.n
 
-num_episodes = 250
+num_episodes = 75000
 discount_factor = 0.9 # reward discount factor (gamma), 1.0 = no discount
 learning_rate = 0.001 # you know this by now
-val_freq = 25 # validation frequency
+val_freq = 15000 # validation frequency
 
 # setup policy network
 
@@ -298,6 +298,7 @@ try:
         losses.append(loss.item())
         if (i + 1) % val_freq == 0:
             print('saving model for iteration: {}'.format(str(i+1)))
+            print('Value of epsilon when saving the model is: {}'.format(str(epsilon)))
             t = datetime.date.today().strftime("%Y-%m-%d")
             PATH = "resources/reinforce_agent_{}_{}.pt".format(t,str(i+1))
             torch.save(policy.state_dict(), PATH)
