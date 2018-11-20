@@ -7,12 +7,14 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+import datetime
 from util import flatten_state_not_first_board, get_valid_actions
 from pommerman import characters
 from pommerman.agents import SimpleAgent, RandomAgent, BaseAgent
 from pommerman.configs import ffa_v0_fast_env
 from pommerman.constants import Item
 from pommerman.envs.v0 import Pomme
+from pommerman import forward_model
 
 use_cuda = torch.cuda.is_available()
 print("Cuda:",use_cuda)
@@ -211,16 +213,6 @@ class PolicyNet(nn.Module):
             torch.nn.init.xavier_uniform(m.weight)
             m.bias.data.fill_(0.01)
 
-    # Function from old network
-    def update_params(self, new_params, tau):
-        params = self.state_dict()
-        for k in params.keys():
-            params[k] = (1-tau) * params[k] + tau * new_params[k]
-        self.load_state_dict(params)
-
-    def get_reward(self, obs, action):
-        return self.reward.get_reward(obs, action)
-
 
 def compute_returns(rewards, discount_factor):
     """Compute discounted returns."""
@@ -236,9 +228,8 @@ n_inputs = 372
 n_hidden = 500
 n_outputs = env.action_space.n
 
-num_episodes = 5000
-#rollout_limit = env.spec.timestep_limit # max rollout length
-discount_factor = 1.0 # reward discount factor (gamma), 1.0 = no discount
+num_episodes = 250
+discount_factor = 0.9 # reward discount factor (gamma), 1.0 = no discount
 learning_rate = 0.001 # you know this by now
 val_freq = 25 # validation frequency
 
@@ -246,94 +237,94 @@ val_freq = 25 # validation frequency
 
 policy = PolicyNet(n_inputs, n_hidden, n_outputs, learning_rate)
 
-if use_cuda:
-    policy.cuda()
+config = ffa_v0_fast_env()
+env = Pomme(**config["env_kwargs"])
 
-agents = []
-#for agent_id in range(4):
-#    agents[agent_id] = RandomAgent(config["agent"](agent_id, config["game_type"]))
-agents = {
-    '0' : TrainingAgent(config["agent"](0, config["game_type"])),
-    '1' : SimpleAgent(config["agent"](1, config["game_type"])),
-    '2' : RandomAgent(config["agent"](2, config["game_type"])),
-    '3' : RandomAgent(config["agent"](3, config["game_type"]))
-}
-env.set_agents(list(agents.values()))
+# Create a set of agents (exactly four)
+agent_list = [
+    TrainingAgent(config["agent"](0, config["game_type"])),
+    SimpleAgent(config["agent"](1, config["game_type"])),
+    SimpleAgent(config["agent"](2, config["game_type"])),
+    SimpleAgent(config["agent"](3, config["game_type"])),
+    # agents.DockerAgent("pommerman/simple-agent", port=12345),
+]
+
+env.set_agents(agent_list)
 env.set_training_agent(0) #<- Does not call act method on training agents in env.act
+env.model = forward_model.ForwardModel()
 env.set_init_game_state(None)
 
 # train policy network
-
 try:
-    print('start training')
+    training_rewards, losses = [], []
     epsilon = 1.0
-    rewards, losses, epsilons = [], [], []
+    print('start training')
     for i in range(num_episodes):
         rollout = []
         s = env.reset()
         done = False
-        ep_reward, ep_loss = 0, 0
-        #policy.train()
         while not done:
-            # select action with epsilon-greedy strategy
+
+            with torch.no_grad():
+                a_prob = policy(np.atleast_1d(s[0]))
+            a = (np.cumsum(a_prob.numpy()) > np.random.rand()).argmax()  # sample action
             if np.random.rand() < epsilon:
-                a = env.action_space.sample()
-            else:
-                # generate rollout by iteratively evaluating the current policy on the environment
-                with torch.no_grad():
-                    a = policy(np.atleast_1d(s[0])).argmax().item()
+                a = np.int64(env.action_space.sample())
+                while a_prob[0][a] < 0.01:
+                    a = np.int64(env.action_space.sample())
+
             actions = env.act(s)
-            actions.append(a)
+            actions.insert(0, a)
 
             s1, r, done, _ = env.step(actions)
             rollout.append((s[0], a, r[0]))
             s = s1
+        epsilon *= num_episodes / (i / (num_episodes / 20) + num_episodes)  # decrease epsilon
         # prepare batch
-        print('done with episode:',i)
+
         rollout = np.array(rollout)
-        states = np.vstack(rollout[:,0])
-        actions = np.vstack(rollout[:,1])
-        rewards = np.array(rollout[:,2], dtype=float)
+        states = np.vstack(rollout[:, 0])
+        actions = np.vstack(rollout[:, 1])
+        rewards = np.array(rollout[:, 2], dtype=float)
         returns = compute_returns(rewards, discount_factor)
         # policy gradient update
         policy.optimizer.zero_grad()
-        a_probs = policy([s[0] for s in states]).cpu().gather(1, torch.from_numpy(actions)).view(-1)
+        a_probs = policy([s[0] for s in states]).gather(1, torch.from_numpy(actions)).view(-1)
         loss = policy.loss(a_probs, torch.from_numpy(returns).float())
         loss.backward()
         policy.optimizer.step()
         # bookkeeping
-        #training_rewards.append(sum(rewards))
-        #losses.append(loss.item())
-        #policy.eval()
-
-        #epsilon = epsilon
-        epsilon *= num_episodes/(i/(num_episodes/20)+num_episodes) # decrease epsilon
-        #epsilons.append(epsilon); losses.append(loss)
-
-        # print
-        if (i+1) % val_freq == 0:
+        training_rewards.append(sum(rewards))
+        losses.append(loss.item())
+        if (i + 1) % val_freq == 0:
+            print('saving model for iteration: {}'.format(str(i+1)))
+            t = datetime.date.today().strftime("%Y-%m-%d")
+            PATH = "resources/reinforce_agent_{}_{}.pt".format(t,str(i+1))
+            torch.save(policy.state_dict(), PATH)
             # validation
             validation_rewards = []
-            for _ in range(3):
+            for _ in range(10):
                 s = env.reset()
                 reward = 0
                 done = False
                 while not done:
-                    env.render()
                     with torch.no_grad():
-                        a_prob = policy(np.atleast_1d(s[0]))
-                    a = (np.cumsum(get_numpy(a_prob)) > np.random.rand()).argmax() # sample action
+                        probs = policy(np.atleast_1d(s[0]))
+                        a = probs.argmax().item()
                     actions = env.act(s)
-                    actions.insert(0,a)
-
+                    actions.insert(0, a)
                     s, r, done, _ = env.step(actions)
-                    #r = policy.get_reward(s[0], Action(a))
                     reward += r[0]
                 validation_rewards.append(reward)
-                print(reward)
-                env.render(close=True)
-            print('{:4d}. mean training reward: {:6.2f}, mean validation reward: {:6.2f}, mean loss: {:7.4f}'.format(i+1, np.mean(rewards[-val_freq:]), np.mean(validation_rewards), np.mean(losses[-val_freq:])))
+            print('{:4d}. mean training reward: {:6.2f}, mean validation reward: {:6.2f}, mean loss: {:7.4f}'.format(
+                i + 1, np.mean(training_rewards[-val_freq:]), np.mean(validation_rewards), np.mean(losses[-val_freq:])))
     env.close()
     print('done')
 except KeyboardInterrupt:
     print('interrupt')
+
+
+## Save file
+t = datetime.date.today().strftime("%Y-%m-%d")
+PATH = "resources/reinforce_agent_{}.pt".format(t)
+torch.save(policy.state_dict(), PATH)
