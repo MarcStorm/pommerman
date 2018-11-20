@@ -33,12 +33,24 @@ class StopAgent(agents.BaseAgent):
     def act(self, obs, action_space):
         return 0
 
+def manualEnv(agents):
+    """
+    A method that returns an env with one training agent and three stop agents defined 
+    by a list that is passed to the method
+    """
+    
+    env.set_agents(agent_list)
+    env.set_training_agent(0) #<- Does not call act method on training agents in env.act
+    #env.model = ReinforceModel()
+    env.set_init_game_state(None)
+        
+    return env  
 
 def randomEnv():
     """
     A method that returns an env with one training agent and three stop agents
     """
-        # Instantiate the environment
+    # Instantiate the environment
     config = ffa_v0_fast_env()
     env = Pomme(**config["env_kwargs"])
 
@@ -105,3 +117,9 @@ def stopEnv():
     env.set_init_game_state(None)
         
     return env
+
+def createEnvironment(func):
+    def newEnvironment():
+        func()
+
+    return newEnvironment
