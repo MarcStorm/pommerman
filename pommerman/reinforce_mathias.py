@@ -1,46 +1,18 @@
-import util
-
 '''An example to show how to set up an pommerman game programmatically'''
-import time
 import copy
-import pommerman
-from util import flatten_state
-from pommerman.agents import SimpleAgent, RandomAgent, PlayerAgent, BaseAgent
-from pommerman.characters import Bomber
-from pommerman import constants as c
-from pommerman.configs import ffa_v0_fast_env
-from pommerman.envs.v0 import Pomme
-from pommerman.characters import Bomber
-from pommerman import utility
-from pommerman import forward_model
-from pommerman import constants
-from pommerman.constants import Action, Item
-import os
-import sys
-import numpy as np
-import torch
-import random
-import datetime
-import util
-from pommerman.agents import SimpleAgent, RandomAgent, PlayerAgent, BaseAgent
-from pommerman.configs import ffa_v0_fast_env
-from pommerman.envs.v0 import Pomme
-from pommerman.characters import Bomber
-from pommerman import utility, characters
-from pommerman.constants import Action
-from collections import deque
-from torch.nn.parameter import Parameter
-import torch.nn.init as init
-import torch.nn.functional as F
-import torch.optim as optim
-import torch.nn as nn
 
 # Notebook 6.3
 import numpy as np
 import torch
 import torch.nn as nn
-import torch.optim as optim
 import torch.nn.functional as F
+import torch.optim as optim
+from util import flatten_state_not_first_board, get_valid_actions
+from pommerman import characters
+from pommerman.agents import SimpleAgent, RandomAgent, BaseAgent
+from pommerman.configs import ffa_v0_fast_env
+from pommerman.constants import Item
+from pommerman.envs.v0 import Pomme
 
 use_cuda = torch.cuda.is_available()
 print("Cuda:",use_cuda)
@@ -110,7 +82,7 @@ class Reward(object):
         else:
             # Game running: 0 for alive, -1 for dead.
             if self.agent.is_alive:
-                valid_actions = util.get_valid_actions(obs)
+                valid_actions = get_valid_actions(obs)
                 if action in valid_actions:
                     return reward - 1
                 else:
@@ -223,7 +195,7 @@ class PolicyNet(nn.Module):
 
         x2 = board.view(-1, self.convolution_out_size)
 
-        x = util.flatten_state_not_first_board(x)
+        x = flatten_state_not_first_board(x)
         x = torch.cat([x2, x], dim=1)
 
         x = self.ffn(x)
