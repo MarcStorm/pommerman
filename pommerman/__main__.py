@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
-from train import PolicyTraining
-from neuralnet import ConvNet
+from .train.policylearn import PolicyTraining
+from .neuralnet.convolutional import ConvNet
 
 if __name__ == '__main__':
     # Chose a neural network to train
