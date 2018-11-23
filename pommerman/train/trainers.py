@@ -22,9 +22,10 @@ class BaseTraining(object):
         This method should never be instantiated on its own. It is used to inherit from.
     """
 
-    def __init__(self, env):
+    def __init__(self, env, net):
         super().__init__()
         self.env = env
+        self.neuralNet = net
 
     def saveNetwork(self):
         dirpath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -40,7 +41,7 @@ class BaseTraining(object):
 class PolicyTraining(BaseTraining):
     
     def __init__(self, env, neuralNet, num_episodes, discount_factor, val_freq):
-        super().__init__(env)
+        super().__init__(env, neuralNet)
         self.num_episodes = num_episodes
         self.discount_factor = discount_factor
         self.val_freq = val_freq
@@ -126,7 +127,7 @@ class PolicyTraining(BaseTraining):
 class QTraining(BaseTraining):
     
     def __init__(self, env, neuralNet, num_episodes, discount_factor, val_freq):
-        super().__init__(env)
+        super().__init__(env, neuralNet)
         self.num_episodes = num_episodes
         self.discount_factor = discount_factor
         self.val_freq = val_freq

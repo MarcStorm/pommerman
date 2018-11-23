@@ -45,7 +45,7 @@ class PolicyNet(nn.Module):
         """
         board = obs['board'].copy()
         enemies = obs['enemies']
-        mask = np.isin(board, enemies)
+        mask = np.isin(board, [a.value for a in enemies])
         board[mask] = 1
         board[~mask] = 0
         return board
@@ -71,10 +71,12 @@ class PolicyNet(nn.Module):
         board = np.zeros_like(obs['board'])
         strength = obs['bomb_blast_strength']
         life = obs['bomb_life']
-        for x,y in np.argwhere(life>0):
-            s = strength[x,y]
-            l = life[x,y]
-            board[y,max(0, x-s):min(10, x+s)] = l
-            board[max(0, y-s):min(10, y+s),x] = l
+        bombs = np.argwhere(life>0)
+        bombs = [(x,y,strength[x,y],life[x,y]) for x,y in bombs]
+        bombs.sort(key=lambda x: x[3], reverse=True)
+
+        for x,y,s,l in bombs:
+            board[y, max(0, int(x-s)):min(10, int(x+s+1))] = 10-l
+            board[max(0, int(y-s)):min(10, int(y+s+1)),x] = 10-l
         return board
 
