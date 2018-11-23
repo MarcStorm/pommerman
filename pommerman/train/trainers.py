@@ -59,7 +59,7 @@ class PolicyTraining(BaseTraining):
                 while(not done):
                     # generate rollout by iteratively evaluating the current policy on the environment
                     with torch.no_grad():
-                        a_prob = self.neuralNet(np.atleast_1d(s[3]))
+                        a_prob = self.neuralNet(np.atleast_1d(s[0]))
                     a = (np.cumsum(a_prob.numpy()) > np.random.rand()).argmax() # sample action
 
                     actions = self.env.act(s)
@@ -67,7 +67,7 @@ class PolicyTraining(BaseTraining):
                     
                     obs, reward, done, info = self.env.step(actions)
                     
-                    rollout.append((s[3], a, reward[3]))
+                    rollout.append((s[0], a, reward[0]))
                     
                     s = obs
                     if done: break
