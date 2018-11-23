@@ -13,7 +13,7 @@ from .base import PolicyNet, get_cuda, get_numpy
 class ConvNet(PolicyNet):
     def __init__(
             self, input_shape=(4,11,11), num_channels=64, output_size=6,
-            batch_norm=True, activation=F.relu):
+            batch_norm=True, activation=F.relu, learning_rate=1E-3):
         super(ConvNet, self).__init__()
 
         assert len(input_shape) == 3
@@ -41,9 +41,10 @@ class ConvNet(PolicyNet):
         self.fc1 = nn.Linear(self.flattened_size, 1024)
         self.fc2 = nn.Linear(1024, output_size)
 
+        self.optimizer = optim.Adam(self.parameters(), lr=learning_rate)
+
 
     def forward(self, obs):
-        print(obs)
         x = self.compact_state_list(obs)
 
         x = self.conv1(x)
@@ -73,20 +74,10 @@ class ConvNet(PolicyNet):
         describing agents position, enemies, danger zones and the board itself.
         Useful for convolution layers with 4 input channels
         """
-        board = obs['board']
+        board = self.board_no_agents(obs)
         enemy = self.enemy_map(obs)
-        print("Enemy:")
-        print(enemy)
-        print("----------------")
-
         danger = self.danger_map(obs)
-        print("Danger:")
-        print(danger)
-        print("----------------")
-
         position = self.position_map(obs)
-        print("Position:")
-        print(position)
-        print("----------------")
+
         return np.stack((board, enemy, danger, position))
 
