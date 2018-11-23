@@ -64,7 +64,6 @@ class PolicyTraining(BaseTraining):
                     # generate rollout by iteratively evaluating the current policy on the environment
                     with torch.no_grad():
                         a_prob = self.neuralNet(np.atleast_1d(s[0]))
-                        print(a_prob)
                     a = (np.cumsum(a_prob.numpy()) > np.random.rand()).argmax() # sample action
                     # sample random action based on epsilon
                     if np.random.rand() < epsilon:
@@ -73,14 +72,12 @@ class PolicyTraining(BaseTraining):
                     actions = self.env.act(s)
                     actions.insert(0,a)
                     
-                    obs, reward, done, info = self.env.step(actions)
+                    obs, reward, done, _ = self.env.step(actions)
 
                     if self.reward is not None:
                         r = self.reward.get_reward(s[0], a)
                     else:
                         r = reward[0]
-
-                    print(r)
                     
                     rollout.append((s[0], a, r))
                     
@@ -122,8 +119,12 @@ class PolicyTraining(BaseTraining):
                                 a = self.neuralNet(np.atleast_1d(s[0])).float().argmax().item()  
                             actions = self.env.act(obs)
                             actions.insert(0,a)
-                            s, r, done, info = self.env.step(actions)
-                            reward += r[0]
+                            s, reward, done, _ = self.env.step(actions)
+                            if self.reward is not None:
+                                r = self.reward.get_reward(s[0], a)
+                            else:
+                                r = reward[0]
+                            reward += r
                             if done: break
                         validation_rewards.append(reward)
                     t = datetime.datetime.now()
@@ -159,24 +160,18 @@ class QTraining(BaseTraining):
                 rollout = []
                 s = self.env.reset()
                 done = False
-                #policy.train()
+                self.neuralNet.train()
                 while not done:
                     # generate rollout by iteratively evaluating the current policy on the environment
                     with torch.no_grad():
                         a_prob = self.neuralNet(np.atleast_1d(s[0]))
-                        #a_prob = policy(s[0])
-                        #print(s[0])
                     a = (np.cumsum(a_prob.numpy()) > np.random.rand()).argmax() # sample action
 
                     actions = self.env.act(s)
                     actions.insert(0,a)
 
-                    #print(actions)
-
                     s1, r, done, _ = self.env.step(actions)
-                    #print(r)
                     rollout.append((s[0], a, r[0]))
-                    #print("\n\nrollout:",rollout,"\n\n")
                     s = s1
                 # prepare batch
                 if(i % 10 == 0):
@@ -196,7 +191,7 @@ class QTraining(BaseTraining):
                 # bookkeeping
                 training_rewards.append(sum(rewards))
                 losses.append(loss.item())
-                #policy.eval()
+                self.neuralNet.eval()
                 # print
                 if (i+1) % self.val_freq == 0:
                     # validation

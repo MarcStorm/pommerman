@@ -38,6 +38,15 @@ class PolicyNet(nn.Module):
         return -torch.mean(torch.mul(torch.log(action_probabilities), returns))
 
 
+    def board_no_agents(self, obs):
+        """
+        Returns the board without any agents
+        """
+        board = obs['board'].copy()
+        board[board>9] = 0
+        return board
+
+
     def enemy_map(self, obs):
         """
         Returns an 11x11 ndarray where 1 indicated enemy

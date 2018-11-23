@@ -74,9 +74,10 @@ class ConvNet(PolicyNet):
         describing agents position, enemies, danger zones and the board itself.
         Useful for convolution layers with 4 input channels
         """
-        board = obs['board']
+        board = self.board_no_agents(obs)
         enemy = self.enemy_map(obs)
         danger = self.danger_map(obs)
         position = self.position_map(obs)
+
         return np.stack((board, enemy, danger, position))
 

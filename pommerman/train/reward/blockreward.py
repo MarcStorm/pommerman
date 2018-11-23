@@ -6,6 +6,9 @@ import numpy as np
 from pommerman.constants import Item, Action
 
 class BlockReward(BaseReward):
+    """
+    Block reward gives the agent a reward for destroying blocks within the game
+    """
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -60,8 +63,10 @@ class BlockReward(BaseReward):
             # Game running: 0 for alive, -1 for dead.
             if self.agent.is_alive:
                 valid_actions = get_valid_actions(obs)
-                if action in valid_actions:
+                if action == Action.Stop:
                     return reward - 1
+                if action in valid_actions:
+                    return reward + 1
                 else:
                     return reward - 2
                 return reward
