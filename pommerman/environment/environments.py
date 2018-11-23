@@ -68,9 +68,9 @@ def randomEnv(config):
 def stopEnv(config):
     agent_list = [
         TrainingAgent(config["agent"](0, config["game_type"])),
-        agents.StopAgent(config["agent"](1, config["game_type"])),
-        agents.StopAgent(config["agent"](2, config["game_type"])),
-        agents.StopAgent(config["agent"](3, config["game_type"])),
+        StopAgent(config["agent"](1, config["game_type"])),
+        StopAgent(config["agent"](2, config["game_type"])),
+        StopAgent(config["agent"](3, config["game_type"])),
     ]
     return agent_list
 
