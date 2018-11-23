@@ -45,7 +45,6 @@ class ConvNet(PolicyNet):
 
 
     def forward(self, obs):
-        print(obs)
         x = self.compact_state_list(obs)
 
         x = self.conv1(x)
@@ -77,18 +76,7 @@ class ConvNet(PolicyNet):
         """
         board = obs['board']
         enemy = self.enemy_map(obs)
-        print("Enemy:")
-        print(enemy)
-        print("----------------")
-
         danger = self.danger_map(obs)
-        print("Danger:")
-        print(danger)
-        print("----------------")
-
         position = self.position_map(obs)
-        print("Position:")
-        print(position)
-        print("----------------")
         return np.stack((board, enemy, danger, position))
 
