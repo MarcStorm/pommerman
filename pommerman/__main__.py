@@ -12,7 +12,7 @@ if __name__ == '__main__':
     # Set up an environment
     env = stopEnv(None)
 
-    # Chose a reward function to tain with
+    # Chose a reward function to tain with (or None for default reward function)
     r = BlockReward(env)
 
     # Initialize a trainer
