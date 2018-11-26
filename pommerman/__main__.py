@@ -3,7 +3,7 @@
 from train import PolicyTraining
 from train.reward import BlockReward
 from neuralnet.convolutional import ConvNet
-from environment import stopEnv, randomEnv
+from environment import stopEnv, randomEnv, simpleEnv
 
 if __name__ == '__main__':
     # Chose a neural network to train
@@ -16,7 +16,7 @@ if __name__ == '__main__':
     env = stopEnv(static=True)
 
     # Chose a reward function to tain with (or None for default reward function)
-    r = BlockReward(env)
+    r = None
 
     # Initialize a trainer
     trainer = PolicyTraining(env, net, num_episodes=500, val_freq=100, discount_factor=0.00, visualize=True, reward=r)

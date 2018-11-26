@@ -41,7 +41,8 @@ class ConvNet(PolicyNet):
         self.fc1 = nn.Linear(self.flattened_size, 1024)
         self.fc2 = nn.Linear(1024, output_size)
 
-        self.optimizer = optim.Adam(self.parameters(), lr=learning_rate)
+        #self.optimizer = optim.Adam(self.parameters(), lr=learning_rate)
+        self.optimizer = optim.SGD(self.parameters(), lr=learning_rate)
 
 
     def forward(self, obs):
@@ -80,4 +81,3 @@ class ConvNet(PolicyNet):
         position = self.position_map(obs)
 
         return np.stack((board, enemy, danger, position))
-
