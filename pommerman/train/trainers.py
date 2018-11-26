@@ -34,12 +34,12 @@ class BaseTraining(object):
         filename = "resources/q_agent_{}.pt".format(t)
         PATH = os.path.join(dirpath, filename)
         print (PATH)
-        
+
         torch.save(self.neuralNet.state_dict(), PATH)
 
 
 class PolicyTraining(BaseTraining):
-    
+
     def __init__(self, env, neuralNet, num_episodes, discount_factor, val_freq, visualize=False, reward=None):
         super().__init__(env, neuralNet)
         self.num_episodes = num_episodes
@@ -71,27 +71,27 @@ class PolicyTraining(BaseTraining):
 
                     actions = self.env.act(s)
                     actions.insert(0,a)
-                    
+
                     obs, reward, done, _ = self.env.step(actions)
 
                     if self.reward is not None:
                         r = self.reward.get_reward(s[0], a)
                     else:
                         r = reward[0]
-                    
+
                     rollout.append((s[0], a, r))
-                    
+
                     s = obs
                     if done: break
 
-                epsilon *= self.num_episodes / (i / (self.num_episodes / 20) + self.num_episodes)  # decrease epsilon   
+                epsilon *= self.num_episodes / (i / (self.num_episodes / 20) + self.num_episodes)  # decrease epsilon
                 # prepare batch
                 rollout = np.array(rollout)
                 states = np.vstack(rollout[:,0])
                 actions = np.vstack(rollout[:,1])
                 rewards = np.array(rollout[:,2], dtype=float)
                 returns = self.compute_returns(rewards, self.discount_factor)
-                
+
                 # policy gradient update
                 self.neuralNet.optimizer.zero_grad()
 
@@ -101,11 +101,11 @@ class PolicyTraining(BaseTraining):
                 loss = self.neuralNet.loss(a_probs, torch.from_numpy(returns).float())
                 loss.backward()
                 self.neuralNet.optimizer.step()
-                
+
                 # bookkeeping
                 training_rewards.append(sum(rewards))
                 losses.append(loss.item())
-                
+
                 # print
                 if (i+1) % self.val_freq == 0:
                     # validation
@@ -118,14 +118,14 @@ class PolicyTraining(BaseTraining):
                             if self.visualize:
                                 self.env.render()
                             with torch.no_grad():
-                                a = self.neuralNet(np.atleast_1d(s[0])).float().argmax().item()  
+                                a = self.neuralNet(np.atleast_1d(s[0])).float().argmax().item()
                             actions = self.env.act(obs)
                             actions.insert(0,a)
-                            s, reward, done, _ = self.env.step(actions)
+                            s, rewards, done, _ = self.env.step(actions)
                             if self.reward is not None:
                                 r = self.reward.get_reward(s[0], a)
                             else:
-                                r = reward[0]
+                                r = rewards[0]
                             reward += r
                             if done: break
                         validation_rewards.append(reward)
@@ -146,7 +146,7 @@ class PolicyTraining(BaseTraining):
         return returns
 
 class QTraining(BaseTraining):
-    
+
     def __init__(self, env, neuralNet, num_episodes, discount_factor, val_freq):
         super().__init__(env, neuralNet)
         self.num_episodes = num_episodes
@@ -223,7 +223,7 @@ class QTraining(BaseTraining):
             self.env.close()
             print('done')
         except KeyboardInterrupt:
-            print('interrupt')  
+            print('interrupt')
 
 
     def compute_returns(self, rewards):

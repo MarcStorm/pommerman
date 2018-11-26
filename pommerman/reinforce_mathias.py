@@ -167,7 +167,7 @@ class PolicyNet(nn.Module):
 
         self.ffn.apply(self.init_weights)
 
-        self.optimizer = optim.Adam(self.parameters(), lr=learning_rate)
+        self.optimizer = optim.SGD(self.parameters(), lr=learning_rate)
 
 
     def forward(self, x):
@@ -202,7 +202,7 @@ class PolicyNet(nn.Module):
 
         x = self.ffn(x)
 
-        x = F.softmax(x, dim=1)
+        #x = F.softmax(x, dim=1)
         return x
 
     def loss(self, action_probabilities, returns):
@@ -228,10 +228,10 @@ n_inputs = 372
 n_hidden = 500
 n_outputs = env.action_space.n
 
-num_episodes = 75000
-discount_factor = 0.9 # reward discount factor (gamma), 1.0 = no discount
-learning_rate = 0.001 # you know this by now
-val_freq = 15000 # validation frequency
+num_episodes = 1000
+discount_factor = 1 # reward discount factor (gamma), 1.0 = no discount
+learning_rate = 0.1 # you know this by now
+val_freq = 100 # validation frequency
 
 # setup policy network
 
@@ -267,11 +267,20 @@ try:
 
             with torch.no_grad():
                 a_prob = policy(np.atleast_1d(s[0]))
-            a = (np.cumsum(a_prob.numpy()) > np.random.rand()).argmax()  # sample action
+                print("a_prob: {}".format(a_prob))
+            a = (np.cumsum(a_prob.numpy()) > np.random.rand()).argmax() # sample action
+            # sample random action based on epsilon
             if np.random.rand() < epsilon:
                 a = np.int64(env.action_space.sample())
-                while a_prob[0][a] < 0.01:
-                    a = np.int64(env.action_space.sample())
+
+            #with torch.no_grad():
+            #    a_prob = policy(np.atleast_1d(s[0]))
+
+            #a = (np.cumsum(a_prob.numpy()) > np.random.rand()).argmax()  # sample action
+            #if np.random.rand() < epsilon:
+            #    a = np.int64(env.action_space.sample())
+            #    while a_prob[0][a] < 0.01:
+            #        a = np.int64(env.action_space.sample())
 
             actions = env.act(s)
             actions.insert(0, a)
