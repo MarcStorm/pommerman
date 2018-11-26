@@ -37,6 +37,10 @@ class PolicyNet(nn.Module):
         # pylint: disable=maybe-no-member
         return -torch.mean(torch.mul(torch.log(action_probabilities), returns))
 
+    
+    def num_trainable_params(self):
+        return sum(p.numel() for p in self.parameters() if p.requires_grad)
+
 
     def board_no_agents(self, obs):
         """
