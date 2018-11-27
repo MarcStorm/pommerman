@@ -260,6 +260,7 @@ try:
     epsilon = 1.0
     print('start training')
     for i in range(num_episodes):
+        #print(epsilon)
         rollout = []
         s = env.reset()
         done = False
@@ -267,7 +268,7 @@ try:
 
             with torch.no_grad():
                 a_prob = policy(np.atleast_1d(s[0]))
-                print("a_prob: {}".format(a_prob))
+                #print("a_prob: {}".format(a_prob))
             a = (np.cumsum(a_prob.numpy()) > np.random.rand()).argmax() # sample action
             # sample random action based on epsilon
             if np.random.rand() < epsilon:
@@ -288,7 +289,8 @@ try:
             s1, r, done, _ = env.step(actions)
             rollout.append((s[0], a, r[0]))
             s = s1
-        epsilon *= num_episodes / (i / (num_episodes / 20) + num_episodes)  # decrease epsilon
+        #epsilon *= num_episodes / (i / (num_episodes / 20) + num_episodes)  # decrease epsilon
+        epsilon *= num_episodes / (i / (num_episodes / 2) + num_episodes)  # decrease epsilon
         # prepare batch
 
         rollout = np.array(rollout)
