@@ -9,14 +9,17 @@ if __name__ == '__main__':
     # Chose a neural network to train
     net = ConvNet()
 
+    pytorch_total_params = sum(p.numel() for p in net.parameters() if p.requires_grad)
+    print("Parameters: {}".format(pytorch_total_params))
+
     # Set up an environment
-    env = simpleEnv()
+    env = stopEnv(static=True)
 
     # Chose a reward function to tain with (or None for default reward function)
     r = None
 
     # Initialize a trainer
-    trainer = PolicyTraining(env, net, num_episodes=500, val_freq=100, discount_factor=0.99, visualize=True, reward=r)
+    trainer = PolicyTraining(env, net, num_episodes=500, val_freq=100, discount_factor=0.00, visualize=True, reward=r)
 
     # Start training the network
     trainer.train()

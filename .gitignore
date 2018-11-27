@@ -759,4 +759,6 @@ modules.xml
 .idea/misc.xml
 *.ipr
 
+*.json
+
 # End of https://www.gitignore.io/api/intellij+all

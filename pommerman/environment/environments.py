@@ -5,6 +5,8 @@ from pommerman import agents, characters
 from pommerman.configs import ffa_v0_fast_env
 from pommerman.envs.v0 import Pomme
 
+from .static import StaticPomme
+
 import torch
 import os 
 
@@ -73,10 +75,14 @@ def loadNetwork(net_name):
         return PATH
 
 def createEnvironment(func):
-    def environment_wrapper(*args, **kwargs):
+    def environment_wrapper(*args, static=False, **kwargs):
         config = ffa_v0_fast_env()
-        env = Pomme(**config["env_kwargs"])
-
+        if static:
+            env = StaticPomme(**config["env_kwargs"])
+        else:
+            env = Pomme(**config["env_kwargs"])
+            
+            
         if 'net_dict' in kwargs and 'manual_agents' in kwargs:
             agent_list  = func(config,kwargs['net_dict'], kwargs['manual_agents'])
 
