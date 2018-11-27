@@ -229,7 +229,7 @@ n_hidden = 500
 n_outputs = env.action_space.n
 
 num_episodes = 1000
-discount_factor = 1 # reward discount factor (gamma), 1.0 = no discount
+discount_factor = 0.9 # reward discount factor (gamma), 1.0 = no discount
 learning_rate = 0.1 # you know this by now
 val_freq = 100 # validation frequency
 
