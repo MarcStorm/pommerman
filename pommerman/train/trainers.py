@@ -84,7 +84,7 @@ class PolicyTraining(BaseTraining):
                     s = obs
                     if done: break
 
-                epsilon *= self.num_episodes / (i / (self.num_episodes / 20) + self.num_episodes)  # decrease epsilon
+                epsilon *= self.num_episodes / (i / (self.num_episodes / 8) + self.num_episodes)  # decrease epsilon
                 # prepare batch
                 rollout = np.array(rollout)
                 states = np.vstack(rollout[:,0])
