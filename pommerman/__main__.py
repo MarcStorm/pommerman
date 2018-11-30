@@ -9,8 +9,7 @@ if __name__ == '__main__':
     # Chose a neural network to train
     net = ConvNet()
 
-    pytorch_total_params = sum(p.numel() for p in net.parameters() if p.requires_grad)
-    print("Parameters: {}".format(pytorch_total_params))
+    print("Trainable params: {}".format(net.num_trainable_params()))
 
     # Set up an environment
     env = simpleEnv(static=True)
