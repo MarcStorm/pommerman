@@ -109,6 +109,11 @@ class PolicyTraining(BaseTraining):
                 # print
                 if (i+1) % self.val_freq == 0:
                     # validation
+                    print('saving model for iteration: {}'.format(str(i+1)))
+                    print('Value of epsilon when saving the model is: {}'.format(str(epsilon)))
+                    t = datetime.date.today().strftime("%Y-%m-%d")
+                    PATH = "resources/reinforce_agent_{}_{}.pt".format(t,str(i+1))
+                    torch.save(self.neuralNet.state_dict(), PATH)
                     validation_rewards = []
                     for _ in range(10):
                         s = self.env.reset()

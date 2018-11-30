@@ -19,7 +19,7 @@ if __name__ == '__main__':
     r = None
 
     # Initialize a trainer
-    trainer = PolicyTraining(env, net, num_episodes=500, val_freq=100, discount_factor=0.00, visualize=True, reward=r)
+    trainer = PolicyTraining(env, net, num_episodes=500, val_freq=25, discount_factor=0.95, visualize=True, reward=r)
 
     # Start training the network
     trainer.train()
