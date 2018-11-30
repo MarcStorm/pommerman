@@ -119,13 +119,13 @@ class PolicyTraining(BaseTraining):
                                 self.env.render()
                             with torch.no_grad():
                                 a = self.neuralNet(np.atleast_1d(s[0])).float().argmax().item()
-                            actions = self.env.act(obs)
+                            actions = self.env.act(s)
                             actions.insert(0,a)
-                            s, rewards, done, _ = self.env.step(actions)
+                            s, r_all, done, _ = self.env.step(actions)
                             if self.reward is not None:
                                 r = self.reward.get_reward(s[0], a)
                             else:
-                                r = rewards[0]
+                                r = r_all[0]
                             reward += r
                             if done: break
                         validation_rewards.append(reward)

@@ -13,7 +13,7 @@ if __name__ == '__main__':
     print("Parameters: {}".format(pytorch_total_params))
 
     # Set up an environment
-    env = stopEnv(static=True)
+    env = simpleEnv(static=True)
 
     # Chose a reward function to tain with (or None for default reward function)
     r = None
