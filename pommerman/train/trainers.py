@@ -8,6 +8,7 @@ import numpy as np
 
 import datetime
 import torch
+import json
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
@@ -53,7 +54,7 @@ class PolicyTraining(BaseTraining):
         # train policy network
 
         try:
-            training_rewards, losses = [], []
+            training_rewards, validation_rewards, losses, a_probs_list = [], [], [], []
             epsilon = 1.0
             print('start training')
             for i in range(self.num_episodes):
@@ -65,6 +66,8 @@ class PolicyTraining(BaseTraining):
                     with torch.no_grad():
                         a_prob = self.neuralNet(np.atleast_1d(s[0]))
                     a = (np.cumsum(a_prob.numpy()) > np.random.rand()).argmax() # sample action
+                    a_probs_list.append(a_prob.numpy()[0].tolist())
+
                     # sample random action based on epsilon
                     if np.random.rand() < epsilon:
                         a = np.int64(self.env.action_space.sample())
@@ -109,12 +112,11 @@ class PolicyTraining(BaseTraining):
                 # print
                 if (i+1) % self.val_freq == 0:
                     # validation
-                    print('saving model for iteration: {}'.format(str(i+1)))
-                    print('Value of epsilon when saving the model is: {}'.format(str(epsilon)))
+                    #print('saving model for iteration: {}'.format(str(i+1)))
+                    #print('Value of epsilon when saving the model is: {}'.format(str(epsilon)))
                     t = datetime.date.today().strftime("%Y-%m-%d")
                     PATH = "resources/reinforce_agent_{}_{}.pt".format(t,str(i+1))
-                    torch.save(self.neuralNet.state_dict(), PATH)
-                    validation_rewards = []
+                    #torch.save(self.neuralNet.state_dict(), PATH)
                     for _ in range(10):
                         s = self.env.reset()
                         reward = 0
@@ -139,6 +141,10 @@ class PolicyTraining(BaseTraining):
                         self.env.render(close=True)
                     print('{:4d}. mean training reward: {:6.2f}, mean validation reward: {:6.2f}, mean loss: {:7.4f}, time: {}'.format(i+1, np.mean(training_rewards[-self.val_freq:]), np.mean(validation_rewards), np.mean(losses[-self.val_freq:]), t))
             print('done')
+            self.saveList(training_rewards, 'training_rewards')
+            self.saveList(validation_rewards, 'validation_rewards')
+            self.saveList(losses, 'losses')
+            self.saveList(a_probs_list, 'a_probs_list')
         except KeyboardInterrupt:
             print('interrupt')
 
@@ -149,6 +155,10 @@ class PolicyTraining(BaseTraining):
         for t in reversed(range(len(rewards)-1)):
             returns[t] = rewards[t] + discount_factor * returns[t+1]
         return returns
+
+    def saveList(self, list_to_save, filename):
+        with open('resources/' + filename + '.json', 'w') as f:
+            json.dump(list_to_save, f)
 
 class QTraining(BaseTraining):
 
