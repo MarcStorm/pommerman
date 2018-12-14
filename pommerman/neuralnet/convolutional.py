@@ -59,7 +59,7 @@ class ConvNet(PolicyNet):
         x = self.fc1(x)
         x = self.activation(x)
         out = self.fc2(x)
-        return torch.exp(F.log_softmax(out, dim=1))
+        return out #torch.exp(F.log_softmax(out, dim=1))
 
 
     def compact_state_list(self, obs):
