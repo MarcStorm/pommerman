@@ -11,9 +11,7 @@ from .base import PolicyNet, get_cuda, get_numpy
 
 
 class ConvNet(PolicyNet):
-    def __init__(
-            self, input_shape=(4,11,11), num_channels=64, output_size=6,
-            batch_norm=True, activation=F.relu, learning_rate=1E-3):
+    def __init__(self, input_shape=(4,11,11), num_channels=64, output_size=6, batch_norm=True, activation=F.relu, learning_rate=1E-3):
         super(ConvNet, self).__init__()
 
         assert len(input_shape) == 3
@@ -61,7 +59,7 @@ class ConvNet(PolicyNet):
         x = self.fc1(x)
         x = self.activation(x)
         out = self.fc2(x)
-        return out
+        return out #torch.exp(F.log_softmax(out, dim=1))
 
 
     def compact_state_list(self, obs):
@@ -81,3 +79,10 @@ class ConvNet(PolicyNet):
         position = self.position_map(obs)
 
         return np.stack((board, enemy, danger, position))
+        
+    # Used in Q learning
+    def update_params(self, new_params, tau):
+        params = self.state_dict()
+        for k in params.keys():
+            params[k] = (1-tau) * params[k] + tau * new_params[k]
+        self.load_state_dict(params)
