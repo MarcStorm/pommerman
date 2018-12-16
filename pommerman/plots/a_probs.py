@@ -23,4 +23,4 @@ plt.xlabel('Iterations')
 plt.ylabel('Probability')
 plt.show()
 
-fig.savefig("a_probs.pdf", bbox_inches='tight')
+fig.savefig("a_probs.pdf", bbox_inches='tight', transparent=True)

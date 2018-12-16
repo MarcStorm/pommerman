@@ -38,4 +38,4 @@ plt.xlabel('Iterations')
 plt.ylabel('Reward')
 plt.show()
 
-fig.savefig("random_train_val.pdf", bbox_inches='tight')
+fig.savefig("random_train_val.pdf", bbox_inches='tight', transparent=True)
