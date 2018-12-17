@@ -21,7 +21,6 @@ def show_plot(d):
     w, h = plt.figaspect(1)
     fig = plt.figure(figsize=(w*0.5,h*0.5))
     plt.plot(range(num_episodes), data, color='blue', label='Epsilon')
-    plt.legend(loc='upper right')
     plt.xlabel('Iterations')
     plt.ylabel('Epsilon')
     plt.xticks([])
