@@ -5,22 +5,29 @@ import json
 
 plt.style.use('seaborn-darkgrid')
 
-data = []
 num_episodes = 150000
-epsilon = 1.0
-for i in range(num_episodes):
-    data.append(epsilon)
-    epsilon *= num_episodes / (i / (num_episodes / 8) + num_episodes)  # decrease epsilon
+
+def calc_epsilon(d):
+    data = []
+    epsilon = 1.0
+    for i in range(num_episodes):
+        data.append(epsilon)
+        epsilon *= num_episodes / (i / (num_episodes / d) + num_episodes)  # decrease epsilon
+    return data
 
 
-w, h = plt.figaspect(0.35)
-fig = plt.figure(figsize=(w*0.5,h*0.5))
-plt.plot(range(num_episodes), data, color='blue', label='Epsilon')
+def show_plot(d):
+    data = calc_epsilon(d)
+    w, h = plt.figaspect(1)
+    fig = plt.figure(figsize=(w*0.5,h*0.5))
+    plt.plot(range(num_episodes), data, color='blue', label='Epsilon')
+    plt.legend(loc='lower left')
+    plt.xlabel('Iterations')
+    plt.ylabel('Epsilon')
+    plt.xticks([])
+    plt.show()
 
-plt.legend(loc='lower left')
-plt.xlabel('Iterations')
-plt.ylabel('Epsilon')
-plt.xticks([])
-plt.show()
+    fig.savefig("epsilon_{}.pdf".format(d), bbox_inches='tight', transparent=True)
 
-fig.savefig("epsilon_8.pdf", bbox_inches='tight', transparent=True)
+show_plot(20)
+show_plot(8)
