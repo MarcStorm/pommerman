@@ -33,7 +33,8 @@ n = 50
 y = [sum(val[i:i + n])/50 for i in range(0, len(val), n)]
 plt.plot([i*25000+25000 for i in range(0, len(y))], y, color='green', label='Validation')
 
-plt.legend(loc='lower right')
+plt.legend(loc='upper left')
+plt.ylim(-1, 1) 
 plt.xlabel('Iterations')
 plt.ylabel('Reward')
 plt.show()
