@@ -1,19 +1,17 @@
 \section{Discussion}
 \label{sec:discussion}
-It is evident from the literature that all the agents that do well have been trained for millions of times.\cite{rwightman} All tested setups showed the same sign of early convergence towards a single action. Our hypothesis is that longer training would yield more time for exploration in this giant search space and the agent might be able to take more meaningful actions.
+
+\subsection{Reward function}
+
+\subsection{Lack of training}
+% - Complexity
+%   - It takes a lot of correct random actions to get a reward of 1 by killing the enemies
+% - Exploration / Exploitation
+It is evident from the literature that all the agents that do well have been trained for millions of times. An example of this is \cite{rwightman}'s agent, which has been trained for the same pommerman environment for approximately 60 millions games. Another one is \cite{kormelink2018exploration} which has been trained for a million games, but in a $7 \times 7$ static classic bomberman environment rather than a $11 \times 11$ environment. All of the trained setups showed the same sign of early convergence towards a single action. Our hypothesis is that the setups simple have not had enough time for training and a lot more training would yield for more exploration in the massive search space. This could result in that the agent would be able to take more meaningful actions rather than just sticking to a single action. The reasoning behind this hypothesi
+
+
 
 Problems in learning to play could be because of the gap between an untrained agent and the actions needed to beat three simple agents is simply too large. That gab combined with the ever changing board and the randomness in the simple agents movement would create a giant search space and likely result in the agent never learning why it lost the game.
 
 
-
-
-
-
-\paragraph{Reward function}
-
-\paragraph{Lack of training}
-% - Complexity
-%   - It takes a lot of correct random actions to get a reward of 1 by killing the enemies
-% - Exploration / Exploitation
-
-\paragraph{Networks}
+\subsection{Networks}
