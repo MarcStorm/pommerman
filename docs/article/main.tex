@@ -1,0 +1,106 @@
+% Template for ICASSP-2010 paper; to be used with:
+%          mlspconf.sty  - ICASSP/ICIP LaTeX style file adapted for MLSP, and
+%          IEEEbib.bst - IEEE bibliography style file.
+% --------------------------------------------------------------------------
+\documentclass{article}
+\usepackage{amsmath,graphicx,02460}
+
+
+
+\toappear{02456 Deep Learning, DTU Compute, Autumn 2018}
+
+
+% Example definitions.
+% --------------------
+\def\x{{\mathbf x}}
+\def\L{{\cal L}}
+
+% Title.
+% ------
+\title{Pommerman}
+%
+% Single address.
+% ---------------
+\name{Alexander D. Juhl, Marc S. Larsen, Marcus S. Hansen, Mark B. Jensen, Mathias P.~V. Mortensen \\ s134073, s144452, s144438, s144474, s144450}
+%\name{Mark B. Jensen (s144474), Mathias P.~V. Mortensen (s144450)}
+%\address{}
+%
+% For example:
+% ------------
+\address{DTU\\
+	Department of Applied Mathematics and Computer Science\\
+	Richard Petersens Plads, Building 324, DK-2800 Kgs. Lyngby}
+%
+% Two addresses (uncomment and modify for two-address case).
+% ----------------------------------------------------------
+%\twoauthors
+%  {Alexander D. Juhl (s134073), Marc S. Larsen (s144452)}%
+%	{School A-B\\
+%	Department A-B\\
+%	Address A-B}
+ %   {Marcus S. Hansen (s144438), Mark B. Jensen (s144474), Mathias P.~V. Mortensen (s144450)}
+%	{School C-D\\
+%	Department C-D\\
+%	Address C-D}
+%
+\begin{document}
+%\ninept
+
+\maketitle
+
+\input{docs/article/sections/abstract.tex}
+\input{docs/article/sections/introduction}
+\input{docs/article/sections/background.tex}
+\input{docs/article/sections/related_work.tex}
+\input{docs/article/sections/methods.tex}
+\input{docs/article/sections/results.tex}
+\input{docs/article/sections/discussion.tex}
+\input{docs/article/sections/future_work.tex}
+\input{docs/article/sections/conclusion.tex}
+
+% Below is an example of how to insert images. Delete the ``\vspace'' line,
+% uncomment the preceding line ``\centerline...'' and replace ``imageX.ps''
+% with a suitable PostScript file name.
+% -------------------------------------------------------------------------
+%\begin{figure}[htb]
+
+%\begin{minipage}[b]{1.0\linewidth}
+%  \centering
+%  \centerline{\includegraphics[width=8.5cm]{image1}}
+%  \vspace{2.0cm}
+%  \centerline{(a) Result 1}\medskip
+%\end{minipage}
+%
+%\begin{minipage}[b]{.48\linewidth}
+%  \centering
+%  \centerline{\includegraphics[width=4.0cm]{image3}}
+%  \vspace{1.5cm}
+%  \centerline{(b) Results 3}\medskip
+%\end{minipage}
+%\hfill
+%\begin{minipage}[b]{0.48\linewidth}
+%  \centering
+%  \centerline{\includegraphics[width=4.0cm]{image4}}
+%  \vspace{1.5cm}
+%  \centerline{(c) Result 4}\medskip
+%\end{minipage}
+%
+%\caption{Example of placing a figure with experimental results.}
+%\label{fig:res}
+%
+%\end{figure}
+
+% To start a new column (but not a new page) and help balance the last-page
+% column length use \vfill\pagebreak.
+% -------------------------------------------------------------------------
+\vfill
+\pagebreak
+
+% References should be produced using the bibtex program from suitable
+% BiBTeX files (here: strings, refs, manuals). The IEEEbib.bst bibliography
+% style file from IEEE produces unsorted bibliography list.
+% -------------------------------------------------------------------------
+\bibliographystyle{IEEEbib}
+\bibliography{refs}
+
+\end{document}
