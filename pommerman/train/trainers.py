@@ -68,7 +68,7 @@ class PolicyTraining(BaseTraining):
                     # generate rollout by iteratively evaluating the current policy on the environment
                     with torch.no_grad():
                         a_prob = self.neuralNet(np.atleast_1d(s[0]))
-                    print(a_prob)
+                    #print(a_prob)
                     a = (np.cumsum(a_prob.numpy()) > np.random.rand()).argmax() # sample action
                     a_probs_list.append(a_prob.numpy()[0].tolist())
 
@@ -148,8 +148,8 @@ class PolicyTraining(BaseTraining):
                         self.env.render(close=True)
                     print('{:4d}. mean training reward: {:6.2f}, mean validation reward: {:6.2f}, mean loss: {:7.4f}, time: {}'.format(i+1, np.mean(training_rewards[-self.val_freq:]), np.mean(validation_rewards[-validation_games:]), np.mean(losses[-self.val_freq:]), t))
             print('done')
-            print(training_rewards,"  ",validation_rewards,"   ",losses)
-            print(type(training_rewards),"  ",type(validation_rewards),"   ",type(losses))
+            #print(training_rewards,"  ",validation_rewards,"   ",losses)
+            #print(type(training_rewards),"  ",type(validation_rewards),"   ",type(losses))
             self.saveList(training_rewards, 'training_rewards_softmax')
             self.saveList(validation_rewards, 'validation_rewards_softmax')
             self.saveList(losses, 'losses_softmax')
