@@ -26,6 +26,8 @@ ENTRY
     type
     volume
     year
+    url
+    urldate
   }
   {}
   { label }
@@ -821,6 +823,10 @@ FUNCTION {misc}
   howpublished new.block.checka
   howpublished output
   format.date output
+  url new.block.checka
+  url output
+  urldate new.block.checka
+  urldate output
   new.block
   note output
   fin.entry

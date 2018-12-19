@@ -1,21 +1,20 @@
 \section{Related Work}
+\label{sec:relatedwork}
 % Related work is other articles and solutions. Can often be in introduction or background if we want.
-% - Starting point
 
 % Questions to answer for each source
 % - What problem do they solve?
 % - How do they solve it?
 % - How does it relate to Pommerman?
 
+The literature show many different solutions for approaching single- and multi-agent nonstationary reinforcement learning problems like Pommerman.
 
-% https://github.com/rwightman/pytorch-pommerman-rl
-\subsection{PyTorch RL for Pommerman}
+In a single agent system has \cite{rwightman} been able to train an agent to solve the Pommerman problem in a FFA with a win rate of $95\%$. This has been achieved by utilising actor-critic algorithm together with spatial feature representation and a CNN based model. However this win rate is purely achieved by playing defensively and relies on the other so called simple agents from the Pommerman environment to kill themselves in the FFA.
 
-% http://www.ai.rug.nl/~mwiering/GROUP/ARTICLES/ICAART_EXPLORATION_BOMBERMAN_2018.pdf
-\subsection{Exploration Methods for Connectionist Q-Learning in Bomberman}
+An alternative to the actor-critic algorithm is the Q-learning algorithm, which has been used by \cite{tokic2010adaptive} to train an agent to play the original Bomberman game, which Pommmerman is a variation of. The focus of the research done by \cite{tokic2010adaptive} is to test how different methods for balancing the exploration versus exploitation dilemma in reinforcement learning.
 
 % https://cs.gmu.edu/~eclab/papers/panait05cooperative.pdf
-\subsection{Cooperative Multi-Agent Learning: The State of the Art}
+%\subsection{Cooperative Multi-Agent Learning: The State of the Art}
 
 % https://arxiv.org/pdf/1706.02275.pdf
-\subsection{Multi-Agent Actor-Critic for Mixed Cooperative-Competitive Environments}
+%\subsection{Multi-Agent Actor-Critic for Mixed Cooperative-Competitive Environments}
