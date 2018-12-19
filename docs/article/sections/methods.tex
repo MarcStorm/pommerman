@@ -1,12 +1,7 @@
 \section{Methods}
-Given the different methods that can be used for training a reinforcement learning agent an environment has been set up where one can easily change the type of opponents within the pommerman environment. Furthermore the ability to change between a value-function-based method such as Q-learning, and a policy search method realised with the gradient estimator REINFORCE has been implemented.\cite{sutton1998a} To make the starting point more simple it is made possible to hold the board static, rather than using an new randomly generated board every time as is the case in figure \ref{fig:pomIntro}. The structure of the environment can be seen in figure \ref{fig:uml}.
-
-\begin{figure}[htb]
-    \centerline{\includegraphics[width=0.8\linewidth]{docs/article/inputs/02456-UML.pdf}}
-    \caption{UML of workflow.}\label{fig:uml}
-\end{figure}
-
-
+\label{sec:methods}
+% FROM POSTER
+% Given the different methods that can be used for training a reinforcement learning agent an environment has been set up where one can easily change the type of opponents within the Pommerman environment. Furthermore the ability to change between a value-function-based method such as Q-learning, and a policy search method realised with the gradient estimator REINFORCE has been implemented.\cite{sutton1998a} The structure of the environment can be seen in figure \ref{fig:uml}.
 
 % Methods used in our solution, could here be network choice, algorithm, parameter-choice etc.
 % REINFORCE paper reference
@@ -20,46 +15,73 @@ Given the different methods that can be used for training a reinforcement learni
 % - Why was the method used?
 % - How does it work?
 
-\subsection{Reinforce algorithm}
+\subsection{REINFORCE algorithm}
+\label{sec:reinforce}
 
-\subsection{Deep Q-learning}
+\subsection{Q-learning algorithm}
 % mention bomberman article
 
-\subsection{Feature engineering}
+\subsection{Convolutional Network}
+\label{sec:conv}
+The policy neural network model has been accomplished by three convolutional layers followed by two fully connected layers as seen in figure~\ref{fig:network}. To achieve regularisation of the data, batch normalisation has been utilised after each convolutional layer. The activation function is ReLU.
 
-\subsection{Convolutional network}
+\begin{figure}[htb]
+    \centerline{\includegraphics[width=1.0\linewidth]{docs/article/inputs/conv.pdf}}
+    \caption{Layout of the neural network}\label{fig:network}
+\end{figure}
 
-\subsection{Exploration / Exploitation (episilon decay)}
+Some feature engineering has been performed on the input data to reduce complexity (i.e. supplying agent position as sets of coordinates may introduce unnecessary complexity). The state is represented by a $11\times 11\times 4$ tensor in which the following information is conveyed:
+\begin{itemize}
+    \item A $11\times 11$ tensor conveying obstacle positions
+    \item A $11\times 11$ tensor conveying the agent's position
+    \item A $11\times 11$ tensor conveying enemy agent positions
+    \item A $11\times 11$ tensor conveying \emph{danger zones}
+\end{itemize}
+The term \emph{danger zones} is referred to as positions in which a bomb will eventually detonate and cause an agent harm. The intention is to represent the state as straightforward as possible to increase learning rates.
+
+
+\subsection{Exploration / Exploitation}
+% The number of possible states in the pommerman environment is enormous
+To address the inherent problem in reinforcement learning of exploration versus exploitation while training the agent, was an $\epsilon$-greedy strategy with a decay introduced. The decay is defined as a function $\gamma$ of time.\cite{nieuwdorp2017dare} Adding the $\gamma$ function somewhat allows for control of when the agent should start exploiting what it has learned. In figure~\ref{fig:gamma} are the values of $\epsilon$ illustrated, where it is decayed by two different $\gamma$ functions. In both cases have an initial value of $\epsilon=1$ been used, i.e. the first iteration is $100\%$ random actions.
 
 \begin{figure}[htb]
     \begin{minipage}[b]{.48\linewidth}
         \centering
         \centerline{\includegraphics[width=\linewidth]{pommerman/plots/epsilon_8.pdf}}
-        \centerline{(a) Epsilon decay 1}\medskip
+        \centerline{(a) $\epsilon$ value where $\gamma(x=8)$.}\medskip
     \end{minipage}
     \hfill
     \begin{minipage}[b]{0.48\linewidth}
         \centering
         \centerline{\includegraphics[width=\linewidth]{pommerman/plots/epsilon_20.pdf}}
-        \centerline{(b) Epsilon decay 2}\medskip
+        \centerline{(b) $\epsilon$ value where $\gamma(x=20)$.}\medskip
     \end{minipage}
-    \caption{Example of placing a figure with experimental results.}
-    \label{fig:res}
+    \caption{$\gamma$ = $n / (i / (n / x) + n)$ where $i \in iterations$.}
+    \label{fig:gamma}
 \end{figure}
 
-\subsection{Static board}
-% Static board to reduce complexity
+(a) is extending the exploration, such that the value of $\epsilon \approx 0$ when approximately $85\%$ of the iterations has been carried out. (b) on the other hand will almost exclusively exploit when approximately $60\%$ of the iterations has been carried out, that is the value of $\epsilon \approx 0$.
 
-\subsection{Reward function}
+% Not completely sure the argument blow is valid as the two graphs have different slopes.
+(a) was primarily introduced to maximise the exploration, while keeping the amount of iterations for training at a minimum, as it would require roughly $42\%$ more iterations to achieve the same quantity of exploration with (b).
+
+Another technique that was added in order to try and motivate the agent to explore the map, was to introduce a so called \emph{stop agent}, that would simply perform the action \emph{Stop} all the time. Both the random and simple agents have a probability of blowing themselves up, which will reward our agent with a positive reward if it is the last one standing. If this positive reward is achieved by doing nothing, it could promote the actions that was taken in that iteration thereby increasing the probability for performing a single action. The idea behind having the other agents standing still is that our agent would only be able to achieve a positive reward by exploring the board and potentially blow up its opponents. If all agent are standing still for long enough the game will end in a tie every the agent are rewarded with a negative reward.
+
+\subsection{Static Board}
+\label{sec:static}
+% Static board to reduce complexity
+To reduce the complexity of the search space has the option for keeping the Pommerman board static been introduced for both the training and validation of the network. This is rather than using an new randomly generated board every time a training or validation is carried out as is the case in figure~\ref{fig:pomIntro}. By doing so reduces the number of different boards the agent has to learn to a single board and thereby reducing the total number of possible states tremendously.
+
+\subsection{Reward Function}
 % Simple +/-1 1
 % Cite bomberman/our tweaked version
-Functionality to change the reward function has also been introduced. Besides the standard reward function that comes with the pommerman environment, where the agents receives a score of 1 for winning and -1 for loosing, some agents were trained with reward shaping. The general motivation for introducing the reward shaping was in an attempt to encourage the agent to avoid getting stuck in a local minimum. One of the reward functions used for this was the same as was used by \cite{kormelink2018exploration} and can be seen in table~\ref{tab:rew}. This reward function was introduced to encourage the agent to explore the map by rewarding the agent for blowing up wall and giving it negative reward for moving and performing illegal actions, like walking into a wall. I.e. if the agent wish to receive a total positive rewards it has to blow up opponents or walls.
+Functionality to change the reward function has also been introduced. Besides the standard reward function that comes with the Pommerman environment, where the agents receives a score of 1 for winning and -1 for loosing, some agents were trained with reward shaping. The general motivation for introducing the reward shaping was to encourage the agent to avoid getting stuck in a local minimum. One of the reward functions used for this was the same as was used by \cite{kormelink2018exploration} and can be seen in table~\ref{tab:rew}. 
 
 \begin{table}[htb]
     \centerline{
         \begin{tabular}{|l|r|}
             \hline
-            action                  & reward   \\ 
+            Action                  & Reward   \\ 
             \hline
             Blow up opponent 		& $100$	\\
             Blow up wall  			& $30$  \\
@@ -71,3 +93,5 @@ Functionality to change the reward function has also been introduced. Besides th
     }
     \caption{A table with an example of reward shaping.}\label{tab:rew}
 \end{table}
+
+This specific reward function was introduced in an attempt to encourage the agent to explore the map by rewarding the agent for blowing up wall and giving it negative reward for moving and performing illegal actions, like walking into a wall. In other words if the agent wish to receive a total positive reward it has to blow up opponents or walls.
