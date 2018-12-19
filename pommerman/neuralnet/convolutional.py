@@ -11,7 +11,7 @@ from .base import PolicyNet, get_cuda, get_numpy
 
 
 class ConvNet(PolicyNet):
-    def __init__(self, input_shape=(4,11,11), num_channels=64, output_size=6, batch_norm=True, activation=F.relu, learning_rate=1E-3):
+    def __init__(self, input_shape=(4,11,11), num_channels=64, output_size=6, batch_norm=True, activation=F.relu, learning_rate=1E-4):
         super(ConvNet, self).__init__()
 
         assert len(input_shape) == 3
