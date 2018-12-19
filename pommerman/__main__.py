@@ -19,7 +19,7 @@ if __name__ == '__main__':
     env = simpleEnv(static=True)
 
     # Chose a reward function to tain with (or None for default reward function)
-    r = None
+    r = BlockReward(env)
 
     # Initialize a trainer
     trainer = PolicyTraining(env, net, num_episodes=150000, val_freq=25000, discount_factor=0.9, visualize=False, reward=r)

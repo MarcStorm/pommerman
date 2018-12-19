@@ -39,7 +39,7 @@ class BlockReward(BaseReward):
         curr_freq = self.get_board_freq(obs['board'])
         wood_diff = last_freq[Item.Wood] - curr_freq[Item.Wood]
 
-        reward += 30*wood_diff
+        reward += 0.10*wood_diff
 
         self.last_obs = copy.deepcopy(obs)
 
@@ -49,26 +49,26 @@ class BlockReward(BaseReward):
         if len(alive_agents) == 0:
             print("TIE!")
             # Game is tie, everyone gets -1.
-            return reward - 300
+            return reward - 1
         elif len(alive_agents) == 1:
             # An agent won. Give them +1, others -1.
             if alive_agents[0] == self.agent_id:
-                return reward + 100
+                return reward + 0.333
             else:
-                return reward - 300
+                return reward - 1
         elif self.env._step_count > self.env._max_steps:
             # Game is over from time. Everyone gets -1.
-            return reward - 300
+            return reward - 1
         else:
             # Game running: 0 for alive, -1 for dead.
             if self.agent.is_alive:
                 valid_actions = get_valid_actions(obs)
                 if action == Action.Stop:
-                    return reward - 1
+                    return reward - 0.00333
                 if action in valid_actions:
-                    return reward + 1
+                    return reward - 0.00333
                 else:
-                    return reward - 2
+                    return reward - 0.00666
                 return reward
             else:
-                return reward - 300
+                return reward - 1
