@@ -14,11 +14,11 @@ def movingaverage(values, window):
 
 plt.style.use('seaborn-darkgrid')
 
-f = open('training_rewards_softmax.json', 'r')
+f = open('./resources/training_rewards_softmax.json', 'r')
 train = json.loads(f.readline())
 f.close()
 
-f = open('validation_rewards_softmax.json', 'r')
+f = open('./resources/validation_rewards_softmax.json', 'r')
 val = json.loads(f.readline())
 f.close()
 

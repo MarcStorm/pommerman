@@ -7,7 +7,7 @@ import json
 
 plt.style.use('seaborn-darkgrid')
 
-f = open('a_probs_list_softmax.json', 'r')
+f = open('./resources/a_probs_list_softmax.json', 'r')
 data = json.loads(f.readline())
 
 fig = plt.figure()
