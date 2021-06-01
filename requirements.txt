@@ -25,7 +25,7 @@ requests==2.20.0
 ruamel.yaml==0.15.75
 scipy==1.1.0
 six==1.11.0
-urllib3==1.24
+urllib3==1.26.5
 websocket-client==0.53.0
 Werkzeug==0.14.1
 wrapt==1.10.11
